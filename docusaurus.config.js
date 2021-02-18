@@ -49,18 +49,22 @@ module.exports = {
               label: '前端工程化',
               to: 'docs/engineering',
             },
+            {
+              label: '数据结构与算法',
+              to: 'docs/algorithms'
+            }
           ],
         },
         {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+              label: '掘金',
+              href: 'https://juejin.cn/user/571401775099528',
             },
             {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
+              label: '语雀',
+              href: 'https://www.yuque.com/oxyzhg',
             },
           ],
         },
@@ -69,7 +73,7 @@ module.exports = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/oxyzhg',
             },
           ],
         },
