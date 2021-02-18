@@ -1,6 +1,7 @@
 ---
 id: readme
 title: 概览
+slug: /advanced/vue
 ---
 
 学习 Vue.js 源码笔记，参考资料：

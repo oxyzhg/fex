@@ -1,7 +1,7 @@
 ---
 id: readme
 title: 概览
-slug: /engineering/
+slug: /engineering
 ---
 
 前端工程化的范围包括：
