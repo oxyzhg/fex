@@ -76,6 +76,10 @@ module.exports = {
       ],
       copyright: `© ${new Date().getFullYear()} Oxyzhg`,
     },
+    prism: {
+      theme: require('prism-react-renderer/themes/github'),
+      darkTheme: require('prism-react-renderer/themes/dracula'),
+    },
   },
   presets: [
     [

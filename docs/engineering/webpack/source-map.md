@@ -1,7 +1,6 @@
 ---
 id: source-map
 title: Source Map 配置分析
-hide_title: true
 ---
 
 ## 使用场景

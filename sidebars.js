@@ -11,8 +11,13 @@ module.exports = {
     {
       type: 'category',
       label: 'Webpack',
-      items: ['source-map'].map(prefixed('engineering/webpack')),
+      items: [
+        'source-map',
+        'hot-module-replacement',
+        'optimization-analysis',
+      ].map(prefixed('engineering/webpack')),
       collapsed: false,
     },
+    'tree-shaking',
   ].map(prefixed('engineering')),
 };
