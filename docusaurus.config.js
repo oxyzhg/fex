@@ -77,8 +77,14 @@ module.exports = {
       copyright: `© ${new Date().getFullYear()} Oxyzhg`,
     },
     prism: {
+      defaultLanguage: 'javascript',
       theme: require('prism-react-renderer/themes/github'),
       darkTheme: require('prism-react-renderer/themes/dracula'),
+    },
+    colorMode: {
+      defaultMode: 'light',
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
     },
   },
   presets: [
