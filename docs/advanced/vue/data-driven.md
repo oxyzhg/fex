@@ -720,6 +720,10 @@ export function createPatchFunction(backend) {
 
 `patch` 的逻辑看上去十分复杂，即使移除了服务端渲染相关的逻辑仍然难以理解，因为它有众多的分支逻辑。但我们都知道，这里后续的逻辑就是为了创建真实 Node，因此 `createElm` 在这里非常重要。
 
+### createElm
+
+`createElm` 的作用是通过虚拟节点创建真实的 DOM 并插入到它的父节点中。
+
 ```js title="src/core/vdom/patch.js"
 function createElm(vnode, insertedVnodeQueue, parentElm, refElm, nested, ownerArray, index) {
   if (isDef(vnode.elm) && isDef(ownerArray)) {
@@ -732,9 +736,11 @@ function createElm(vnode, insertedVnodeQueue, parentElm, refElm, nested, ownerAr
   }
 
   vnode.isRootInsert = !nested; // for transition enter check
+  // highlight-start
   if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
     return;
   }
+  // highlight-end
 
   const data = vnode.data;
   const children = vnode.children;
@@ -773,7 +779,9 @@ function createElm(vnode, insertedVnodeQueue, parentElm, refElm, nested, ownerAr
 }
 ```
 
-`createElm` 的作用是通过虚拟节点创建真实的 DOM 并插入到它的父节点中。我们来看一下它的一些关键逻辑，createComponent 方法目的是尝试创建子组件；接下来判断 `vnode` 是否包含 tag，如果包含，先简单对 tag 的合法性在非生产环境下做校验，看是否是一个合法标签；然后再去调用平台 DOM 的操作去创建一个占位符元素。接下来调用 `createChildren` 方法去创建子元素。
+我们来看一下它的一些关键逻辑，createComponent 方法目的是尝试创建子组件；接下来判断 `vnode` 是否包含 tag，如果包含，先简单对 tag 的合法性在非生产环境下做校验，看是否是一个合法标签；然后再去调用平台 DOM 的操作去创建一个占位符元素。接下来调用 `createChildren` 方法去创建子元素。
+
+### createChildren
 
 ```js title="src/core/vdom/patch.js"
 function createChildren(vnode, children, insertedVnodeQueue) {
