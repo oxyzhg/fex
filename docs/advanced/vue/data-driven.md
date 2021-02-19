@@ -3,6 +3,8 @@ id: data-driven
 title: 数据驱动
 ---
 
+Vue.js 一个核心思想是数据驱动。所谓数据驱动，是指视图是由数据驱动生成的，我们对视图的修改，不会直接操作 DOM，而是通过修改数据。特别是当交互复杂的时候，只关心数据的修改会让代码的逻辑变的非常清晰，因为 DOM 变成了数据的映射，我们所有的逻辑都是对数据的修改，而不用碰触 DOM，这样的代码非常利于维护。这可以看作是是 MVVM 中 binder 的实现。
+
 ## new Vue 发生了什么
 
 ```js title="src/core/instance/index.js"
@@ -74,13 +76,13 @@ Vue.prototype._init = function (options?: Object) {
 };
 ```
 
-Vue 初始化主要就干了几件事情：合并配置，初始化生命周期，初始化事件中心，初始化渲染，初始化 data、props、computed、watcher 等。
+Vue 初始化主要就干了几件事情：**合并配置，初始化生命周期，初始化事件中心，初始化渲染，初始化 data、props、computed、watcher 等**。
 
-注意这里，执行 `vm.$mount` 方法将生命周期推入 Mount 阶段。
+然后，执行 `vm.$mount` 方法将生命周期推入 Mount 阶段。
 
 ## Vue 实例挂载
 
-Vue 中我们是通过 $mount 实例方法去挂载 vm 的，由于虚拟 DOM 编译后可以在不同平台运行，因此这个方法在不同平台有不同的定义。我们来看最常用的定义：
+Vue 中我们是通过 `$mount` 实例方法去挂载 vm 的，由于虚拟 DOM 编译后可以在不同平台运行，因此平台不同定义存在差异。我们来看常见的 web 平台的定义：
 
 ```js title="src/platform/web/entry-runtime-with-compiler.js"
 const mount = Vue.prototype.$mount;
@@ -209,9 +211,13 @@ export function mountComponent(vm: Component, el: ?Element, hydrating?: boolean)
 
 `mountComponent` 核心就是先实例化一个渲染 `Watcher`，在它的回调函数中会调用 `updateComponent` 方法，在此方法中调用 `vm._render` 方法先生成虚拟 Node，最终调用 `vm._update` 更新 DOM。
 
+:::important
+vm.\_render 和 vm.\_update 十分重要又难以理解，它包含了许多 Vue.js 框架的特性。
+:::
+
 ## render
 
-Vue 的 `_render` 方法是实例的一个私有方法，它用来把实例渲染成一个虚拟节点。
+Vue 的 `_render` 方法是实例的一个私有方法，它用来**把实例渲染成一个虚拟节点**。
 
 ```js title="src/core/instance/render.js"
 Vue.prototype._render = function (): VNode {
@@ -537,3 +543,268 @@ export function normalizeChildren(children: any): ?Array<VNode> {
 
 - 如果是 string 类型，则接着判断如果是内置的一些节点，则直接创建一个普通 VNode；如果是为已注册的组件名，则通过 `createComponent` 创建一个组件类型的 VNode；否则创建一个未知的标签的 VNode。
 - 如果是 Component 类型，则直接调用 `createComponent` 创建一个组件类型的 VNode 节点。
+
+## update
+
+Vue 的 `_update` 是实例的一个私有方法，它被调用的时机有 2 个，一个是首次渲染，一个是数据更新的时候。它的作用是将虚拟 DOM 渲染成真实 DOM。
+
+```js title="src/core/instance/lifecycle.js"
+Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
+  const vm: Component = this;
+  const prevEl = vm.$el;
+  const prevVnode = vm._vnode;
+  const prevActiveInstance = activeInstance;
+  activeInstance = vm;
+  vm._vnode = vnode;
+  // Vue.prototype.__patch__ is injected in entry points
+  // based on the rendering backend used.
+  // highlight-start
+  if (!prevVnode) {
+    // initial render
+    vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */);
+  } else {
+    // updates
+    vm.$el = vm.__patch__(prevVnode, vnode);
+  }
+  // highlight-end
+  activeInstance = prevActiveInstance;
+  // update __vue__ reference
+  if (prevEl) {
+    prevEl.__vue__ = null;
+  }
+  if (vm.$el) {
+    vm.$el.__vue__ = vm;
+  }
+  // if parent is an HOC, update its $el as well
+  if (vm.$vnode && vm.$parent && vm.$vnode === vm.$parent._vnode) {
+    vm.$parent.$el = vm.$el;
+  }
+  // updated hook is called by the scheduler to ensure that children are
+  // updated in a parent's updated hook.
+};
+```
+
+`_update` 的核心就是调用 `vm.__patch__` 方法，这个方法在不同平台定义也不同。常见的 web 平台定义：
+
+```js title="src/platforms/web/runtime/index.js"
+Vue.prototype.__patch__ = inBrowser ? patch : noop;
+```
+
+可以看到，甚至在 web 平台上，是否是服务端渲染也会对这个方法产生影响。因为在服务端渲染中，没有真实的浏览器 DOM 环境，所以不需要把 VNode 最终转换成 DOM，因此是一个空函数，而在浏览器端渲染中，它指向了 `patch` 方法。
+
+```js title="src/platforms/web/runtime/patch.js"
+import * as nodeOps from 'web/runtime/node-ops';
+import { createPatchFunction } from 'core/vdom/patch';
+import baseModules from 'core/vdom/modules/index';
+import platformModules from 'web/runtime/modules/index';
+
+// the directive module should be applied last, after all
+// built-in modules have been applied.
+const modules = platformModules.concat(baseModules);
+// highlight-next-line
+export const patch: Function = createPatchFunction({ nodeOps, modules });
+```
+
+这里通过传入 `{nodeOps, modules}` 参数，动态创建了一个 patch 方法。其中，`nodeOps` 封装了一系列 DOM 操作的方法，`modules` 定义了一些模块的钩子函数的实现。
+
+```js title="src/core/vdom/patch.js"
+const hooks = ['create', 'activate', 'update', 'remove', 'destroy'];
+
+export function createPatchFunction(backend) {
+  let i, j;
+  const cbs = {};
+
+  const { modules, nodeOps } = backend;
+
+  for (i = 0; i < hooks.length; ++i) {
+    cbs[hooks[i]] = [];
+    for (j = 0; j < modules.length; ++j) {
+      if (isDef(modules[j][hooks[i]])) {
+        cbs[hooks[i]].push(modules[j][hooks[i]]);
+      }
+    }
+  }
+
+  // ...
+
+  return function patch(oldVnode, vnode, hydrating, removeOnly) {
+    if (isUndef(vnode)) {
+      if (isDef(oldVnode)) invokeDestroyHook(oldVnode);
+      return;
+    }
+
+    let isInitialPatch = false;
+    const insertedVnodeQueue = [];
+
+    if (isUndef(oldVnode)) {
+      // empty mount (likely as component), create new root element
+      isInitialPatch = true;
+      createElm(vnode, insertedVnodeQueue);
+    } else {
+      const isRealElement = isDef(oldVnode.nodeType);
+      if (!isRealElement && sameVnode(oldVnode, vnode)) {
+        // patch existing root node
+        patchVnode(oldVnode, vnode, insertedVnodeQueue, removeOnly);
+      } else {
+        if (isRealElement) {
+          // mounting to a real element
+          // check if this is server-rendered content and if we can perform
+          // a successful hydration.
+          // ...
+          // either not server-rendered, or hydration failed.
+          // create an empty node and replace it
+          oldVnode = emptyNodeAt(oldVnode);
+        }
+
+        // replacing existing element
+        const oldElm = oldVnode.elm;
+        const parentElm = nodeOps.parentNode(oldElm);
+
+        // create new node
+        // highlight-start
+        createElm(
+          vnode,
+          insertedVnodeQueue,
+          // extremely rare edge case: do not insert if old element is in a
+          // leaving transition. Only happens when combining transition +
+          // keep-alive + HOCs. (#4590)
+          oldElm._leaveCb ? null : parentElm,
+          nodeOps.nextSibling(oldElm)
+        );
+        // highlight-end
+
+        // update parent placeholder node element, recursively
+        if (isDef(vnode.parent)) {
+          let ancestor = vnode.parent;
+          const patchable = isPatchable(vnode);
+          while (ancestor) {
+            for (let i = 0; i < cbs.destroy.length; ++i) {
+              cbs.destroy[i](ancestor);
+            }
+            ancestor.elm = vnode.elm;
+            if (patchable) {
+              for (let i = 0; i < cbs.create.length; ++i) {
+                cbs.create[i](emptyNode, ancestor);
+              }
+              // #6513
+              // invoke insert hooks that may have been merged by create hooks.
+              // e.g. for directives that uses the "inserted" hook.
+              const insert = ancestor.data.hook.insert;
+              if (insert.merged) {
+                // start at index 1 to avoid re-invoking component mounted hook
+                for (let i = 1; i < insert.fns.length; i++) {
+                  insert.fns[i]();
+                }
+              }
+            } else {
+              registerRef(ancestor);
+            }
+            ancestor = ancestor.parent;
+          }
+        }
+
+        // destroy old node
+        if (isDef(parentElm)) {
+          removeVnodes(parentElm, [oldVnode], 0, 0);
+        } else if (isDef(oldVnode.tag)) {
+          invokeDestroyHook(oldVnode);
+        }
+      }
+    }
+
+    invokeInsertHook(vnode, insertedVnodeQueue, isInitialPatch);
+    return vnode.elm;
+  };
+}
+```
+
+`patch` 的逻辑看上去十分复杂，即使移除了服务端渲染相关的逻辑仍然难以理解，因为它有众多的分支逻辑。但我们都知道，这里后续的逻辑就是为了创建真实 Node，因此 `createElm` 在这里非常重要。
+
+```js title="src/core/vdom/patch.js"
+function createElm(vnode, insertedVnodeQueue, parentElm, refElm, nested, ownerArray, index) {
+  if (isDef(vnode.elm) && isDef(ownerArray)) {
+    // This vnode was used in a previous render!
+    // now it's used as a new node, overwriting its elm would cause
+    // potential patch errors down the road when it's used as an insertion
+    // reference node. Instead, we clone the node on-demand before creating
+    // associated DOM element for it.
+    vnode = ownerArray[index] = cloneVNode(vnode);
+  }
+
+  vnode.isRootInsert = !nested; // for transition enter check
+  if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
+    return;
+  }
+
+  const data = vnode.data;
+  const children = vnode.children;
+  const tag = vnode.tag;
+  if (isDef(tag)) {
+    // ...
+    // highlight-start
+    vnode.elm = vnode.ns
+      ? nodeOps.createElementNS(vnode.ns, tag)
+      : nodeOps.createElement(tag, vnode);
+    // highlight-end
+    setScope(vnode);
+
+    /* istanbul ignore if */
+    if (__WEEX__) {
+      // ...
+    } else {
+      // highlight-next-line
+      createChildren(vnode, children, insertedVnodeQueue);
+      if (isDef(data)) {
+        invokeCreateHooks(vnode, insertedVnodeQueue);
+      }
+      insert(parentElm, vnode.elm, refElm);
+    }
+
+    if (process.env.NODE_ENV !== 'production' && data && data.pre) {
+      creatingElmInVPre--;
+    }
+  } else if (isTrue(vnode.isComment)) {
+    vnode.elm = nodeOps.createComment(vnode.text);
+    insert(parentElm, vnode.elm, refElm);
+  } else {
+    vnode.elm = nodeOps.createTextNode(vnode.text);
+    insert(parentElm, vnode.elm, refElm);
+  }
+}
+```
+
+`createElm` 的作用是通过虚拟节点创建真实的 DOM 并插入到它的父节点中。我们来看一下它的一些关键逻辑，createComponent 方法目的是尝试创建子组件；接下来判断 `vnode` 是否包含 tag，如果包含，先简单对 tag 的合法性在非生产环境下做校验，看是否是一个合法标签；然后再去调用平台 DOM 的操作去创建一个占位符元素。接下来调用 `createChildren` 方法去创建子元素。
+
+```js title="src/core/vdom/patch.js"
+function createChildren(vnode, children, insertedVnodeQueue) {
+  if (Array.isArray(children)) {
+    if (process.env.NODE_ENV !== 'production') {
+      checkDuplicateKeys(children);
+    }
+    // highlight-start
+    for (let i = 0; i < children.length; ++i) {
+      createElm(children[i], insertedVnodeQueue, vnode.elm, null, true, children, i);
+    }
+    // highlight-end
+  } else if (isPrimitive(vnode.text)) {
+    nodeOps.appendChild(vnode.elm, nodeOps.createTextNode(String(vnode.text)));
+  }
+}
+```
+
+`createChildren` 的逻辑很简单，实际上是遍历子虚拟节点，递归调用 `createElm`，这是一种常用的深度优先的遍历算法，这里要注意的一点是在遍历过程中会把 `vnode.elm` 作为父容器的 DOM 节点占位符传入。
+
+接着再调用 `invokeCreateHooks` 方法执行所有的 create 的钩子并把 `vnode` push 到 `insertedVnodeQueue` 中。最后调用 `insert` 方法把 DOM 插入到父节点中，因为是递归调用，子元素会优先调用 `insert`，所以整个 `vnode` 树节点的插入顺序是先子后父。
+
+## 总结
+
+上面我们梳理了把模板和数据渲染成最终的 DOM 的过程。其实理解到 `mountComponent` 方法实例了一个渲染 Watcher，把更新视图的逻辑注册到回调里即可，其他的内容再深入就设计到编译过程了。
+
+![new vue](../../assets/new-vue.png)
+
+整个过程看起来十分复杂，因为分支逻辑太多，且很难理清。实际上，这是动态给构造函数装配属性方法，然后执行方法的过程。从主线上来看，这个过程完成了以下几件事：
+
+1. **初始化阶段**：合并配置，初始化生命周期，初始化事件中心，初始化渲染，初始化 data、props、computed、watcher 等，然后执行 `$mount` 方法将生命周期推入 Mount 阶段。
+2. **挂载阶段**：首先，校验实例是否存在 render 函数，如果没有则将 template/el 字符串转换为 render 函数，也就是说 render 函数才是生成 VNode 的关键；然后，执行 `mountComponent` 方法实例化一个渲染 Watcher，把创建 VNode、转换为真实节点、执行 patch 方法更新 DOM 等逻辑注册到回调函数中；最后，数据变化触发视图更新。
+
+可以看到，整个过程理清后并不复杂，难点在于生成 render 函数、执行 render 函数生成 VNode、将 VNode 转换为真实节点、执行 patch 方法更新 DOM 等，这些涉及的点大多数都跟框架本身的特性有关联，理清楚基本就是对 Vue.js 无所不知了。
