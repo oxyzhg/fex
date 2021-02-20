@@ -171,12 +171,11 @@ jaVasCript: /*-/*`/*\`/*'/*"/**/ /* */ oNcliCk = alert(); //%0D%0A%0d%0a//</stYl
 
 除了手动检测之外，还可以使用自动扫描工具寻找 XSS 漏洞，例如 [Arachni](https://github.com/Arachni/arachni)、[Mozilla HTTP Observatory](https://github.com/mozilla/http-observatory/)、[w3af](https://github.com/andresriancho/w3af) 等。
 
-## XSS 攻击的总结
+## 总结
 
-- 防范 XSS 是需要后端 RD 和前端 RD 共同参与的系统工程。转义应该在输出 HTML 时进行，而不是在提交用户输入时。
-- 同的上下文，如 HTML 属性、HTML 文字内容、HTML 注释、跳转链接、内联 JavaScript 字符串、内联 CSS 样式表等，所需要的转义规则不一致。 业务 RD 需要选取合适的转义库，并针对不同的上下文调用不同的转义规则。
+XSS 攻击的特点是注入恶意代码，且得到执行。
 
-整体的 XSS 防范是非常复杂和繁琐的，我们不仅需要在全部需要转义的位置，对数据进行对应的转义。而且要防止多余和错误的转义，避免正常的用户输入出现乱码。
+那么我们要预防 XSS 攻击，关键是要**防止恶意代码被执行**。在输出 HTML 时对用户输入的代码进行转译，不同的上下文，如 HTML 属性、HTML 文字内容、HTML 注释、跳转链接、内联 JavaScript 字符串、内联 CSS 样式表等，所需要的转义规则不一致。另外，还要防止多余和错误的转义，避免正常的用户输入出现乱码。
 
 虽然很难通过技术手段完全避免 XSS，但我们可以总结以下原则减少漏洞的产生：
 
