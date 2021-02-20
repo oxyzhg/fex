@@ -17,6 +17,14 @@ module.exports = {
       ].map(prefixed('advanced/vue')),
       collapsed: false,
     },
+    {
+      type: 'category',
+      label: '安全',
+      items: [
+        'xss',
+        'csrf'
+      ].map(prefixed('advanced/security'))
+    }
   ].map(prefixed('advanced')),
 
   /* 前端工程化 */
