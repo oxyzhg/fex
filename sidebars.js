@@ -19,8 +19,16 @@ module.exports = {
     },
     {
       type: 'category',
+      label: '浏览器',
+      items: [
+        'from-url-to-page-load',
+      ].map(prefixed('advanced/browser'))
+    },
+    {
+      type: 'category',
       label: '安全',
       items: [
+        'readme',
         'xss',
         'csrf'
       ].map(prefixed('advanced/security'))
