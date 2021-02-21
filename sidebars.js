@@ -22,6 +22,8 @@ module.exports = {
       label: '浏览器',
       items: [
         'from-url-to-page-load',
+        'browser-storage',
+        'browser-cache',
       ].map(prefixed('advanced/browser'))
     },
     {
