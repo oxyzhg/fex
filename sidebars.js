@@ -25,6 +25,7 @@ module.exports = {
         'browser-storage',
         'browser-cache',
         'browser-gc',
+        'cross-origin',
       ].map(prefixed('advanced/browser'))
     },
     {
