@@ -245,24 +245,7 @@ Vue.prototype._render = function (): VNode {
     // highlight-next-line
     vnode = render.call(vm._renderProxy, vm.$createElement);
   } catch (e) {
-    handleError(e, vm, `render`);
-    // return error render result,
-    // or previous vnode to prevent render error causing blank component
-    /* istanbul ignore else */
-    if (process.env.NODE_ENV !== 'production') {
-      if (vm.$options.renderError) {
-        try {
-          vnode = vm.$options.renderError.call(vm._renderProxy, vm.$createElement, e);
-        } catch (e) {
-          handleError(e, vm, `renderError`);
-          vnode = vm._vnode;
-        }
-      } else {
-        vnode = vm._vnode;
-      }
-    } else {
-      vnode = vm._vnode;
-    }
+    // ...
   }
   // return empty vnode in case the render function errored out
   if (!(vnode instanceof VNode)) {

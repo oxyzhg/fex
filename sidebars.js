@@ -4,7 +4,7 @@ const prefixed = (prefix) => (item) => (typeof item === 'string' ? `${prefix}/${
 module.exports = {
   /* 前端进阶 */
   advanced: [
-    'doc1',
+    'readme',
     {
       type: 'category',
       label: 'Vue.js',

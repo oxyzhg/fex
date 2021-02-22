@@ -311,3 +311,187 @@ export function createComponentInstanceForVnode(
 ```
 
 所以子组件的实例化实际上就是在这个时机执行的，并且它会执行实例的 `_init` 方法。
+
+```js title="src/core/instance/init.js"
+Vue.prototype._init = function (options?: Object) {
+  const vm: Component = this;
+  // merge options
+  if (options && options._isComponent) {
+    // optimize internal component instantiation
+    // since dynamic options merging is pretty slow, and none of the
+    // internal component options needs special treatment.
+    // highlight-next-line
+    initInternalComponent(vm, options);
+  } else {
+    vm.$options = mergeOptions(resolveConstructorOptions(vm.constructor), options || {}, vm);
+  }
+  // ...
+  if (vm.$options.el) {
+    vm.$mount(vm.$options.el);
+  }
+};
+```
+
+`_isComponent` 是内部组件标识，因此这里通过 `initInternalComponent` 方法合并 `options`。
+
+```js title="src/core/instance/init.js"
+export function initInternalComponent(vm: Component, options: InternalComponentOptions) {
+  const opts = (vm.$options = Object.create(vm.constructor.options));
+  // doing this because it's faster than dynamic enumeration.
+  const parentVnode = options._parentVnode;
+  // highlight-start
+  opts.parent = options.parent;
+  opts._parentVnode = parentVnode;
+  // highlight-end
+
+  const vnodeComponentOptions = parentVnode.componentOptions;
+  opts.propsData = vnodeComponentOptions.propsData;
+  opts._parentListeners = vnodeComponentOptions.listeners;
+  opts._renderChildren = vnodeComponentOptions.children;
+  opts._componentTag = vnodeComponentOptions.tag;
+
+  if (options.render) {
+    opts.render = options.render;
+    opts.staticRenderFns = options.staticRenderFns;
+  }
+}
+```
+
+配置合并完成后，在非服务端渲染场景下，会执行 `child.$mount(undefined, false)` 进行挂载。这最终会执行到 `mountComponent` 方法，进而执行 `vm._render` 方法。
+
+```js
+Vue.prototype._render = function (): VNode {
+  const vm: Component = this;
+  const { render, _parentVnode } = vm.$options;
+
+  // set parent vnode. this allows render functions to have access
+  // to the data on the placeholder node.
+  // highlight-next-line
+  vm.$vnode = _parentVnode;
+  // render self
+  let vnode;
+  try {
+    vnode = render.call(vm._renderProxy, vm.$createElement);
+  } catch (e) {
+    // ...
+  }
+  // set parent
+  // highlight-next-line
+  vnode.parent = _parentVnode;
+  return vnode;
+};
+```
+
+注意这里设置了 parent 属性，也就是 `$vnode`，它们是一致父子的关系。
+
+接下来就是把组件的 VNode 渲染成真实节点，执行 `vm_update` 方法。
+
+```js title="src/core/instance/lifecycle.js"
+// highlight-next-line
+export let activeInstance: any = null;
+Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
+  const vm: Component = this;
+  const prevEl = vm.$el;
+  const prevVnode = vm._vnode;
+  const prevActiveInstance = activeInstance;
+  activeInstance = vm;
+  // highlight-next-line
+  vm._vnode = vnode;
+  // Vue.prototype.__patch__ is injected in entry points
+  // based on the rendering backend used.
+  if (!prevVnode) {
+    // initial render
+    vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */);
+  } else {
+    // updates
+    vm.$el = vm.__patch__(prevVnode, vnode);
+  }
+  activeInstance = prevActiveInstance;
+
+  // if parent is an HOC, update its $el as well
+  if (vm.$vnode && vm.$parent && vm.$vnode === vm.$parent._vnode) {
+    vm.$parent.$el = vm.$el;
+  }
+  // updated hook is called by the scheduler to ensure that children are
+  // updated in a parent's updated hook.
+};
+```
+
+这里 `vm._vnode` 和 `vm.$vnode` 的关系就是一种父子关系，用代码表达就是 `vm._vnode.parent === vm.$vnode`，即 `$vnode` 是当前组件的父组件。
+
+另外，这个 `activeInstance` 变量的作用就是保持当前上下文的 Vue 实例，它在执行 `createComponentInstanceForVnode` 时作为 parent 参数传入，把它作为子组件的父 Vue 实例。
+
+实际上，组件的实例与根组件的实例化过程相比，在合并配置、挂载实例等过程中，由于 `parent` 的存在，出现了一些差异。但这其实不用过多解读，目的都是为了实现组件化。
+
+## 合并配置
+
+```js title="src/core/instance/init.js"
+vm.$options = mergeOptions(
+  resolveConstructorOptions(vm.constructor), // Vue.options
+  options || {},
+  vm
+);
+```
+
+`resolveConstructorOptions(vm.constructor)` 相当于 `Vue.options`。
+
+```js title="src/core/global-api/index.js"
+export function initGlobalAPI(Vue: GlobalAPI) {
+  // ...
+  Vue.options = Object.create(null);
+  ASSET_TYPES.forEach((type) => {
+    Vue.options[type + 's'] = Object.create(null);
+  });
+
+  // this is used to identify the "base" constructor to extend all plain-object
+  // components with in Weex's multi-instance scenarios.
+  Vue.options._base = Vue;
+
+  extend(Vue.options.components, builtInComponents);
+  // ...
+}
+```
+
+这段代码创建了一个空对象，然后为对象增加了 `components,directives,filters` 属性，最后把一些内置组件拓展到实例上。
+
+```js title="src/core/util/options.js"
+/**
+ * Merge two option objects into a new one.
+ * Core utility used in both instantiation and inheritance.
+ */
+export function mergeOptions(parent: Object, child: Object, vm?: Component): Object {
+  if (typeof child === 'function') {
+    child = child.options;
+  }
+
+  normalizeProps(child, vm);
+  normalizeInject(child, vm);
+  normalizeDirectives(child);
+  const extendsFrom = child.extends;
+  if (extendsFrom) {
+    parent = mergeOptions(parent, extendsFrom, vm);
+  }
+  if (child.mixins) {
+    for (let i = 0, l = child.mixins.length; i < l; i++) {
+      parent = mergeOptions(parent, child.mixins[i], vm);
+    }
+  }
+  const options = {};
+  let key;
+  for (key in parent) {
+    mergeField(key);
+  }
+  for (key in child) {
+    if (!hasOwn(parent, key)) {
+      mergeField(key);
+    }
+  }
+  function mergeField(key) {
+    const strat = strats[key] || defaultStrat;
+    options[key] = strat(parent[key], child[key], vm, key);
+  }
+  return options;
+}
+```
+
+`mergeOptions` 主要功能就是把 parent 和 child 这两个对象根据一些合并策略，合并成一个新对象并返回。比较核心的几步，先递归把 `extends` 和 `mixins` 合并到 `parent` 上，然后遍历 parent，调用 `mergeField`，然后再遍历 child，如果 key 不在 `parent` 的自身属性上，则调用 `mergeField`。
