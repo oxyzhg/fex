@@ -24,6 +24,7 @@ module.exports = {
         'from-url-to-page-load',
         'browser-storage',
         'browser-cache',
+        'browser-gc',
       ].map(prefixed('advanced/browser'))
     },
     {
