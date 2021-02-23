@@ -425,15 +425,36 @@ Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
 
 ## 合并配置
 
+其实，在执行 `_init` 方法时，不同场景下就合并配置就产生了差异。
+
 ```js title="src/core/instance/init.js"
-vm.$options = mergeOptions(
-  resolveConstructorOptions(vm.constructor), // Vue.options
-  options || {},
-  vm
-);
+Vue.prototype._init = function (options?: Object) {
+  const vm: Component = this;
+  // ...
+  // merge options
+  if (options && options._isComponent) {
+    // optimize internal component instantiation
+    // since dynamic options merging is pretty slow, and none of the
+    // internal component options needs special treatment.
+    // highlight-next-line
+    initInternalComponent(vm, options);
+  } else {
+    // highlight-next-line
+    vm.$options = mergeOptions(resolveConstructorOptions(vm.constructor), options || {}, vm);
+  }
+
+  // ...
+  if (vm.$options.el) {
+    vm.$mount(vm.$options.el);
+  }
+};
 ```
 
-`resolveConstructorOptions(vm.constructor)` 相当于 `Vue.options`。
+其中 `mergeOptions` 在外部调用场景执行，`initInternalComponent` 在组件场景执行。
+
+### 外部调用场景
+
+执行 `mergeOptions` 时，`resolveConstructorOptions(vm.constructor)` 相当于 `Vue.options`。
 
 ```js title="src/core/global-api/index.js"
 export function initGlobalAPI(Vue: GlobalAPI) {
@@ -469,18 +490,22 @@ export function mergeOptions(parent: Object, child: Object, vm?: Component): Obj
   normalizeDirectives(child);
   const extendsFrom = child.extends;
   if (extendsFrom) {
+    // highlight-next-line
     parent = mergeOptions(parent, extendsFrom, vm);
   }
   if (child.mixins) {
     for (let i = 0, l = child.mixins.length; i < l; i++) {
+      // highlight-next-line
       parent = mergeOptions(parent, child.mixins[i], vm);
     }
   }
   const options = {};
   let key;
+  // highlight-next-line
   for (key in parent) {
     mergeField(key);
   }
+  // highlight-next-line
   for (key in child) {
     if (!hasOwn(parent, key)) {
       mergeField(key);
@@ -495,3 +520,169 @@ export function mergeOptions(parent: Object, child: Object, vm?: Component): Obj
 ```
 
 `mergeOptions` 主要功能就是把 parent 和 child 这两个对象根据一些合并策略，合并成一个新对象并返回。比较核心的几步，先递归把 `extends` 和 `mixins` 合并到 `parent` 上，然后遍历 parent，调用 `mergeField`，然后再遍历 child，如果 key 不在 `parent` 的自身属性上，则调用 `mergeField`。
+
+合并后 `vm.$options` 的值差不多是这样：
+
+```js
+vm.$options = {
+  el: '#app',
+  components: {},
+  directives: {},
+  filters: {},
+  created: [
+    function created() {}, // created hooks
+  ],
+  _base: function Vue(options) {
+    this._init();
+  },
+  render: function (h) {},
+};
+```
+
+### 组件调用场景
+
+在组件内部，组件实例的构造函数通过 `Vue.extend` 继承自 `Vue`。
+
+```js title="src/core/global-api/extend.js"
+Vue.extend = function (extendOptions: Object): Function {
+  // ...
+  Sub.options = mergeOptions(Super.options, extendOptions);
+  // ...
+  // keep a reference to the super options at extension time.
+  // later at instantiation we can check if Super's options have
+  // been updated.
+  Sub.superOptions = Super.options;
+  Sub.extendOptions = extendOptions;
+  Sub.sealedOptions = extend({}, Sub.options);
+  // ...
+  return Sub;
+};
+```
+
+其中 `extendOptions` 是在执行 `createComponentInstanceForVnode` 时产生。
+
+```js title="src/core/vdom/create-component.js
+export function createComponentInstanceForVnode(vnode: any, parent: any): Component {
+  // highlight-start
+  const options: InternalComponentOptions = {
+    _isComponent: true,
+    _parentVnode: vnode,
+    parent,
+  };
+  // highlight-end
+  // ...
+  return new vnode.componentOptions.Ctor(options);
+}
+```
+
+这里组件实例化后，立即执行构造函数，然后进入 `this._init(options)` 流程。如果符合 `options._isComponent` 则执行 `initInternalComponent(vm, options)` 逻辑。
+
+```js title="src/core/instance/init.js"
+export function initInternalComponent(vm: Component, options: InternalComponentOptions) {
+  const opts = (vm.$options = Object.create(vm.constructor.options));
+  // doing this because it's faster than dynamic enumeration.
+  const parentVnode = options._parentVnode;
+  opts.parent = options.parent;
+  opts._parentVnode = parentVnode;
+
+  const vnodeComponentOptions = parentVnode.componentOptions;
+  opts.propsData = vnodeComponentOptions.propsData;
+  opts._parentListeners = vnodeComponentOptions.listeners;
+  opts._renderChildren = vnodeComponentOptions.children;
+  opts._componentTag = vnodeComponentOptions.tag;
+
+  if (options.render) {
+    opts.render = options.render;
+    opts.staticRenderFns = options.staticRenderFns;
+  }
+}
+```
+
+这里给 `vm.$options` 保存了父 Vue 实例 `parent`、父 VNode 实例 `parentVnod`。
+
+不管是外部调用场景还是组件场景，他们合并的逻辑大致相似，合并完的结果保留在 `vm.$options` 中，组件场景还会额外增加一些定义组件的私有属性。
+
+## 组件注册
+
+Vue.js 提供了 2 种组件的注册方式，全局注册和局部注册。
+
+### 全局注册
+
+要注册一个全局组件，可以使用 `Vue.component(id, definition)`。它的定义过程发生在最开始初始化 Vue 的全局函数的时候。
+
+```js title="src/core/global-api/assets.js"
+import { ASSET_TYPES } from 'shared/constants';
+import { isPlainObject, validateComponentName } from '../util/index';
+
+export function initAssetRegisters(Vue: GlobalAPI) {
+  /**
+   * Create asset registration methods.
+   */
+  ASSET_TYPES.forEach((type) => {
+    Vue[type] = function (id: string, definition: Function | Object): Function | Object | void {
+      if (!definition) {
+        return this.options[type + 's'][id];
+      } else {
+        // ...
+        if (type === 'component' && isPlainObject(definition)) {
+          definition.name = definition.name || id;
+          definition = this.options._base.extend(definition);
+        }
+        if (type === 'directive' && typeof definition === 'function') {
+          definition = { bind: definition, update: definition };
+        }
+        // highlight-next-line
+        this.options[type + 's'][id] = definition;
+        return definition;
+      }
+    };
+  });
+}
+```
+
+函数首先遍历 `ASSET_TYPES`，得到 `type` 后挂载到 Vue 上 。
+
+由于我们每个组件的创建都是通过 `Vue.extend` 继承而来，也就是在创建子组件构造函数的时候，就把全局注册的资源合并到新构造函数 `vm.$options` 上。
+
+在解析 vnode 过程中，会执行到 `_createElement` 方法，其中有段代码是尝试创建组件 VNode，如果已经注册了对应组件，就会返回组件 VNode。
+
+### 局部注册
+
+局部注册就是 options 的一个配置，使用时机跟全局注册一致。
+
+注意，局部注册和全局注册不同的是，只有该类型的组件才可以访问局部注册的子组件，而全局注册是扩展到 `Vue.options` 下，所以在所有组件创建的过程中，都会从全局的 `Vue.options.components` 扩展到当前组件的 `vm.$options.components` 下，这就是全局注册的组件能被任意使用的原因。
+
+## 异步组件
+
+Vue 也原生支持了异步组件的能力。有 3 种异步组件创建方式。
+
+```js
+Vue.component('async-example', function (resolve, reject) {
+  // 利用 webpack 自动拆分异步代码的能力
+  require(['./my-async-component'], resolve);
+});
+```
+
+```js
+Vue.component(
+  'async-webpack-example',
+  // 该 `import` 函数返回一个 `Promise` 对象
+  () => import('./my-async-component')
+);
+```
+
+```js
+const AsyncComp = () => ({
+  // 异步加载一个组件
+  component: import('./my-component.vue'),
+  // 加载中应当渲染的组件
+  loading: LoadingComp,
+  // 出错时渲染的组件
+  error: ErrorComp,
+  // 渲染加载中组件前的等待时间。默认：200ms
+  delay: 200,
+  // 最长等待时间，超出此时间则渲染错误组件。默认：Infinity
+  timeout: 3000,
+});
+Vue.component('async-example', AsyncComp);
+```

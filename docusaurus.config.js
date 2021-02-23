@@ -25,7 +25,13 @@ module.exports = {
         {
           to: 'docs/engineering',
           activeBasePath: 'docs/engineering',
-          label: '前端工程化',
+          label: '工程化',
+          position: 'right',
+        },
+        {
+          to: 'docs/performance',
+          activeBasePath: 'docs/performance',
+          label: '性能优化',
           position: 'right',
         },
         {

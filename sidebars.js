@@ -55,6 +55,12 @@ module.exports = {
     'tree-shaking',
   ].map(prefixed('engineering')),
 
+  /* 性能优化 */
+  performance: [
+    'performance/readme',
+    'engineering/webpack/optimization-analysis',
+  ],
+
   /* 数据结构与算法 */
   algorithms: [
     {
