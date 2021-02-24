@@ -2,7 +2,7 @@
 const prefixed = (prefix) => (item) => (typeof item === 'string' ? `${prefix}/${item}` : item);
 
 module.exports = {
-  /* 前端进阶 */
+  /* Front-end Advanced */
   advanced: [
     'readme',
     {
@@ -13,7 +13,9 @@ module.exports = {
         'data-driven',
         'componentization',
         'reactive',
-        'compile'
+        'compile',
+        'lifecycle',
+        'next-tick',
       ].map(prefixed('advanced/vue')),
       collapsed: false,
     },
@@ -34,12 +36,12 @@ module.exports = {
       items: [
         'readme',
         'xss',
-        'csrf'
+        'csrf',
       ].map(prefixed('advanced/security'))
     }
   ].map(prefixed('advanced')),
 
-  /* 前端工程化 */
+  /* Front-end Engineering */
   engineering: [
     'readme',
     {
@@ -55,13 +57,13 @@ module.exports = {
     'tree-shaking',
   ].map(prefixed('engineering')),
 
-  /* 性能优化 */
+  /* Performance */
   performance: [
     'performance/readme',
     'engineering/webpack/optimization-analysis',
   ],
 
-  /* 数据结构与算法 */
+  /* Data structures and Algorithms */
   algorithms: [
     {
       type: 'category',
@@ -106,4 +108,14 @@ module.exports = {
       ].map(prefixed('handwrittens')),
     },
   ],
+
+  /* Front-end Interview */
+  interview: [
+    'javascript',
+    'css',
+    'vue',
+    'webpack',
+    'performance',
+    'others',
+  ].map(prefixed('interview')),
 };

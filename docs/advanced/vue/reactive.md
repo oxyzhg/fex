@@ -286,10 +286,7 @@ export function defineReactive(
       if (newVal === value || (newVal !== newVal && value !== value)) {
         return;
       }
-      /* eslint-enable no-self-compare */
-      if (process.env.NODE_ENV !== 'production' && customSetter) {
-        customSetter();
-      }
+      // ...
       if (setter) {
         setter.call(obj, newVal);
       } else {
@@ -315,4 +312,425 @@ export function defineReactive(
 
 ## 依赖收集
 
+### Dep
+
+在执行 `defineReactive` 方法定义数据响应式时，初始化了一个 `Dep` 对象的实例，它的作用是整个 getter 依赖收集的核心。
+
+```js title="src/core/observer/dep.js"
+import type Watcher from './watcher';
+import { remove } from '../util/index';
+
+let uid = 0;
+
+/**
+ * A dep is an observable that can have multiple
+ * directives subscribing to it.
+ */
+export default class Dep {
+  static target: ?Watcher;
+  id: number;
+  subs: Array<Watcher>;
+
+  constructor() {
+    this.id = uid++;
+    this.subs = [];
+  }
+
+  addSub(sub: Watcher) {
+    this.subs.push(sub);
+  }
+
+  removeSub(sub: Watcher) {
+    remove(this.subs, sub);
+  }
+
+  depend() {
+    if (Dep.target) {
+      Dep.target.addDep(this);
+    }
+  }
+
+  notify() {
+    // stabilize the subscriber list first
+    const subs = this.subs.slice();
+    // highlight-start
+    for (let i = 0, l = subs.length; i < l; i++) {
+      subs[i].update();
+    }
+    // highlight-end
+  }
+}
+
+// the current target watcher being evaluated.
+// this is globally unique because there could be only one
+// watcher being evaluated at any time.
+// highlight-next-line
+Dep.target = null;
+const targetStack = [];
+
+export function pushTarget(_target: ?Watcher) {
+  if (Dep.target) targetStack.push(Dep.target);
+  Dep.target = _target;
+}
+
+export function popTarget() {
+  Dep.target = targetStack.pop();
+}
+```
+
+`Dep` 是一个 Class，它定义了一些属性和方法，这里需要特别注意的是它有一个静态属性 `target`，这是一个全局唯一 `Watcher`，这是一个非常巧妙的设计，因为在同一时间只能有一个全局的 `Watcher` 被计算，另外它的自身属性 `subs` 也是 `Watcher` 的数组。
+
+`Dep` 实际上就是对 `Watcher` 的一种管理，`Dep` 脱离 `Watcher` 单独存在是没有意义的。
+
+### Watcher
+
+```js title="src/core/observer/watcher.js"
+let uid = 0;
+
+/**
+ * A watcher parses an expression, collects dependencies,
+ * and fires callback when the expression value changes.
+ * This is used for both the $watch() api and directives.
+ */
+export default class Watcher {
+  vm: Component;
+  expression: string;
+  cb: Function;
+  id: number;
+  deep: boolean;
+  user: boolean;
+  computed: boolean;
+  sync: boolean;
+  dirty: boolean;
+  active: boolean;
+  dep: Dep;
+  deps: Array<Dep>;
+  newDeps: Array<Dep>;
+  depIds: SimpleSet;
+  newDepIds: SimpleSet;
+  before: ?Function;
+  getter: Function;
+  value: any;
+
+  constructor(
+    vm: Component,
+    expOrFn: string | Function,
+    cb: Function,
+    options?: ?Object,
+    isRenderWatcher?: boolean
+  ) {
+    this.vm = vm;
+    if (isRenderWatcher) {
+      vm._watcher = this;
+    }
+    vm._watchers.push(this);
+    // options
+    if (options) {
+      this.deep = !!options.deep;
+      this.user = !!options.user;
+      this.computed = !!options.computed;
+      this.sync = !!options.sync;
+      this.before = options.before;
+    } else {
+      this.deep = this.user = this.computed = this.sync = false;
+    }
+    this.cb = cb;
+    this.id = ++uid; // uid for batching
+    this.active = true;
+    // highlight-next-line
+    this.dirty = this.computed; // for computed watchers
+    this.deps = [];
+    this.newDeps = [];
+    this.depIds = new Set();
+    this.newDepIds = new Set();
+    this.expression = process.env.NODE_ENV !== 'production' ? expOrFn.toString() : '';
+    // parse expression for getter
+    if (typeof expOrFn === 'function') {
+      this.getter = expOrFn;
+    } else {
+      this.getter = parsePath(expOrFn);
+      if (!this.getter) {
+        this.getter = function () {};
+        // ...
+      }
+    }
+    // highlight-start
+    if (this.computed) {
+      this.value = undefined;
+      this.dep = new Dep();
+    } else {
+      this.value = this.get();
+    }
+    // highlight-end
+  }
+
+  /**
+   * Evaluate the getter, and re-collect dependencies.
+   */
+  get() {
+    pushTarget(this);
+    let value;
+    const vm = this.vm;
+    try {
+      // highlight-next-line
+      value = this.getter.call(vm, vm);
+    } catch (e) {
+      if (this.user) {
+        handleError(e, vm, `getter for watcher "${this.expression}"`);
+      } else {
+        throw e;
+      }
+    } finally {
+      // "touch" every property so they are all tracked as
+      // dependencies for deep watching
+      // highlight-start
+      if (this.deep) {
+        traverse(value);
+      }
+      // highlight-end
+      popTarget();
+      this.cleanupDeps();
+    }
+    return value;
+  }
+
+  /**
+   * Add a dependency to this directive.
+   */
+  addDep(dep: Dep) {
+    const id = dep.id;
+    if (!this.newDepIds.has(id)) {
+      this.newDepIds.add(id);
+      this.newDeps.push(dep);
+      if (!this.depIds.has(id)) {
+        dep.addSub(this);
+      }
+    }
+  }
+
+  /**
+   * Clean up for dependency collection.
+   */
+  cleanupDeps() {
+    let i = this.deps.length;
+    while (i--) {
+      const dep = this.deps[i];
+      if (!this.newDepIds.has(dep.id)) {
+        dep.removeSub(this);
+      }
+    }
+    let tmp = this.depIds;
+    this.depIds = this.newDepIds;
+    this.newDepIds = tmp;
+    this.newDepIds.clear();
+    tmp = this.deps;
+    this.deps = this.newDeps;
+    this.newDeps = tmp;
+    this.newDeps.length = 0;
+  }
+
+  /**
+   * Subscriber interface.
+   * Will be called when a dependency changes.
+   */
+  update() {
+    /* istanbul ignore else */
+    if (this.lazy) {
+      this.dirty = true;
+    } else if (this.sync) {
+      this.run();
+    } else {
+      // highlight-next-line
+      queueWatcher(this);
+    }
+  }
+
+  /**
+   * Scheduler job interface.
+   * Will be called by the scheduler.
+   */
+  run() {
+    if (this.active) {
+      const value = this.get();
+      if (
+        value !== this.value ||
+        // Deep watchers and watchers on Object/Arrays should fire even
+        // when the value is the same, because the value may
+        // have mutated.
+        isObject(value) ||
+        this.deep
+      ) {
+        // set new value
+        const oldValue = this.value;
+        this.value = value;
+        if (this.user) {
+          try {
+            this.cb.call(this.vm, value, oldValue);
+          } catch (e) {
+            handleError(e, this.vm, `callback for watcher "${this.expression}"`);
+          }
+        } else {
+          this.cb.call(this.vm, value, oldValue);
+        }
+      }
+    }
+  }
+
+  /**
+   * Evaluate the value of the watcher.
+   * This only gets called for lazy watchers.
+   */
+  evaluate() {
+    this.value = this.get();
+    this.dirty = false;
+  }
+}
+```
+
+`Watcher` 是一个 Class，在它的构造函数中，定义了一些与依赖收集相关的属性。
+
+### 过程分析
+
+以渲染 Watcher 为例：
+
+```js
+let updateComponent = () => {
+  // highlight-next-line
+  vm._update(vm._render(), hydrating);
+};
+
+new Watcher(
+  vm,
+  updateComponent,
+  noop,
+  {
+    before() {
+      if (vm._isMounted) {
+        callHook(vm, 'beforeUpdate');
+      }
+    },
+  },
+  true /* isRenderWatcher */
+);
+```
+
+1. 在执行 `mountComponent` 方法时，会先实例化一个渲染 Watcher，并且更新组件的方法以 `expOrFn` 参数的形式传入，即之后 Watcher 内部的 `getter` 实例方法。
+2. 接着执行它的 `this.get()` 方法，这里会通过 `pushTarget` 把当前 `watcher` 压入 `targetStack` 栈顶。
+3. 然后执行 `this.getter` 方法，即 `updateComponent` 方法，创建 VNode 并渲染到页面。
+4. 其中，在执行 `vm._render()` 方法生成 VNode 时，会访问 `vm` 上定义的响应式数据，此时触发数据对象的 getter。进而执行 `dep.depend`，这个方法的作用是执行 `Dep.target.addDep(this)` 方法，先在订阅者渲染 Watcher 内部保存当前 `dep` 实例；然后再反过来执行 `dep.addSub(this)` 方法，即把当前的 `watcher` 订阅者保存到这个数据持有的 `dep` 中。
+5. 以上依赖收集完成后，还要深度触发所有子项的 getter。
+6. 接下来执行 `popTarget` 将当前 Watcher 弹出栈，将 `Dep.target` 恢复成上一个状态。
+7. 最后执行 `this.cleanupDeps()` 方法，清空依赖。
+
+由于在执行 `vm_render` 方法时，会触发所有视图中用到的数据的 getter，这样实际上就完成了一个依赖收集的过程。其实这里是双向收集的过程，先是订阅者收集依赖，然后依赖又收集了订阅者，这样做的目的是为后续数据变化时候能通知到哪些 `subs` 做准备。
+
+考虑到 Vue.js 是数据驱动，所以每次数据变化都会重新 render，那么 `vm._render()` 方法又会再次执行，并再次触发数据的 getters，为避免重复收集依赖 Watcher 在构造函数中会初始化 2 个 Dep 实例数组，`newDeps` 表示新添加的 Dep 实例数组，而 `deps` 表示上一次添加的 Dep 实例数组。
+
+其实 `Watcher` 和 `Dep` 就是一个非常经典的**观察者设计模式**的实现。
+
 ## 派发更新
+
+### 过程分析
+
+当我们在组件中对响应的数据做了修改，就会触发 setter 的逻辑，调用 `dep.notify()` 方法进行更新。它的作用是遍历所有的 `subs`，也就是 Watcher 的实例数组，执行每一个 `watcher.update` 方法。对于一般的 Watcher 更新场景，会执行到 `queueWatcher(this)` 方法。
+
+```js title="src/core/observer/scheduler.js"
+const queue: Array<Watcher> = [];
+let has: { [key: number]: ?true } = {};
+let waiting = false;
+let flushing = false;
+/**
+ * Push a watcher into the watcher queue.
+ * Jobs with duplicate IDs will be skipped unless it's
+ * pushed when the queue is being flushed.
+ */
+export function queueWatcher(watcher: Watcher) {
+  const id = watcher.id;
+  if (has[id] == null) {
+    has[id] = true;
+    if (!flushing) {
+      queue.push(watcher);
+    } else {
+      // if already flushing, splice the watcher based on its id
+      // if already past its id, it will be run next immediately.
+      let i = queue.length - 1;
+      while (i > index && queue[i].id > watcher.id) {
+        i--;
+      }
+      queue.splice(i + 1, 0, watcher);
+    }
+    // queue the flush
+    if (!waiting) {
+      waiting = true;
+      // highlight-next-line
+      nextTick(flushSchedulerQueue);
+    }
+  }
+}
+```
+
+这里引入了一个队列的概念，这也是 Vue 在做派发更新的时候的一个优化的点，它并不会每次数据改变都触发 `watcher` 的回调，而是把这些 `watcher` 先添加到一个队列里，然后在 `nextTick` 后执行 `flushSchedulerQueue`。
+
+```js title="src/core/observer/scheduler.js"
+let flushing = false;
+let index = 0;
+/**
+ * Flush both queues and run the watchers.
+ */
+function flushSchedulerQueue() {
+  flushing = true;
+  let watcher, id;
+
+  // Sort queue before flush.
+  // This ensures that:
+  // 1. Components are updated from parent to child. (because parent is always
+  //    created before the child)
+  // 2. A component's user watchers are run before its render watcher (because
+  //    user watchers are created before the render watcher)
+  // 3. If a component is destroyed during a parent component's watcher run,
+  //    its watchers can be skipped.
+  // highlight-next-line
+  queue.sort((a, b) => a.id - b.id);
+
+  // do not cache length because more watchers might be pushed
+  // as we run existing watchers
+  for (index = 0; index < queue.length; index++) {
+    watcher = queue[index];
+    if (watcher.before) {
+      watcher.before();
+    }
+    id = watcher.id;
+    has[id] = null;
+    // highlight-next-line
+    watcher.run();
+    // ...
+  }
+
+  // keep copies of post queues before resetting state
+  const activatedQueue = activatedChildren.slice();
+  const updatedQueue = queue.slice();
+
+  resetSchedulerState();
+
+  // call component updated and activated hooks
+  callActivatedHooks(activatedQueue);
+  callUpdatedHooks(updatedQueue);
+  // ...
+}
+```
+
+对队列做了从小到大的排序，这么做主要有以下要确保以下几点：
+
+1. 组件的更新由父到子；因为父组件的创建过程是先于子的，所以 Watcher 的创建也是先父后子，执行顺序也应该保持先父后子。
+2. 用户的自定义 Watcher 要优先于渲染 Watcher 执行；因为用户自定义 Watcher 是在渲染 Watcher 之前创建的。
+3. 如果一个组件在父组件的 Watcher 执行期间被销毁，那么它对应的 Watcher 执行都可以被跳过，所以父组件的 Watcher 应该先执行。
+
+在对 `queue` 排序后，接着就是要对它做遍历，拿到对应的 watcher，执行 `watcher.run()` 方法。该方法会先调用 `this.get()` 获取到最新值，然后执行实例化 Watcher 时传入的回调函数，这种回调函数通常就是我们自定义 Watcher 时的函数。对于渲染 Watcher 方法而言，由于执行 `this.get()` 方法，就会触发重新渲染。
+
+最后，等队列中的 Watcher 都更新完成，执行 `resetSchedulerState` 恢复状态。
+
+整个派发更新的过程可以归纳为以下几个步骤：
+
+1. 修改数据触发响应式数据 getter，遍历所有 `subs` 执行 `sub.update()` 方法派发更新。
+2. 对于同一个事件循环里的更新，会维护一个队列，等本轮事件执行结束后，再清空队列执行 Watcher 更新，即执行 `watcher.run()` 方法。
+3. 全部更新执行完成后，恢复状态。
