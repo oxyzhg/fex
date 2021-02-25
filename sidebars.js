@@ -12,10 +12,22 @@ module.exports = {
         'readme',
         'data-driven',
         'componentization',
+        // {
+        //   type: 'category',
+        //   label: '响应式数据',
+        //   items: [
+        //     'reactive',
+        //     'next-tick',
+        //     'computed-vs-watch',
+        //   ].map(prefixed('advanced/vue')),
+        //   collapsed: false,
+        // },
         'reactive',
         'compile',
         'lifecycle',
         'next-tick',
+        'computed-vs-watch',
+        'component-update',
       ].map(prefixed('advanced/vue')),
       collapsed: false,
     },
@@ -28,7 +40,7 @@ module.exports = {
         'browser-cache',
         'browser-gc',
         'cross-origin',
-      ].map(prefixed('advanced/browser'))
+      ].map(prefixed('advanced/browser')),
     },
     {
       type: 'category',
@@ -37,7 +49,7 @@ module.exports = {
         'readme',
         'xss',
         'csrf',
-      ].map(prefixed('advanced/security'))
+      ].map(prefixed('advanced/security')),
     }
   ].map(prefixed('advanced')),
 

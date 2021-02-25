@@ -399,11 +399,10 @@ export default class Watcher {
   id: number;
   deep: boolean;
   user: boolean;
-  computed: boolean;
+  lazy: boolean;
   sync: boolean;
   dirty: boolean;
   active: boolean;
-  dep: Dep;
   deps: Array<Dep>;
   newDeps: Array<Dep>;
   depIds: SimpleSet;
@@ -428,17 +427,16 @@ export default class Watcher {
     if (options) {
       this.deep = !!options.deep;
       this.user = !!options.user;
-      this.computed = !!options.computed;
+      this.lazy = !!options.lazy;
       this.sync = !!options.sync;
       this.before = options.before;
     } else {
-      this.deep = this.user = this.computed = this.sync = false;
+      this.deep = this.user = this.lazy = this.sync = false;
     }
     this.cb = cb;
     this.id = ++uid; // uid for batching
     this.active = true;
-    // highlight-next-line
-    this.dirty = this.computed; // for computed watchers
+    this.dirty = this.lazy; // for lazy watchers
     this.deps = [];
     this.newDeps = [];
     this.depIds = new Set();
@@ -454,14 +452,8 @@ export default class Watcher {
         // ...
       }
     }
-    // highlight-start
-    if (this.computed) {
-      this.value = undefined;
-      this.dep = new Dep();
-    } else {
-      this.value = this.get();
-    }
-    // highlight-end
+    // highlight-next-line
+    this.value = this.lazy ? undefined : this.get();
   }
 
   /**
@@ -734,3 +726,120 @@ function flushSchedulerQueue() {
 1. 修改数据触发响应式数据 getter，遍历所有 `subs` 执行 `sub.update()` 方法派发更新。
 2. 对于同一个事件循环里的更新，会维护一个队列，等本轮事件执行结束后，再清空队列执行 Watcher 更新，即执行 `watcher.run()` 方法。
 3. 全部更新执行完成后，恢复状态。
+
+## 检测变化的注意事项
+
+### 对象类型
+
+我们都知道，Vue 实例在实例化初始阶段，会使用 `Object.defineProperty` 创建响应式对象，但这只会初始化一次，也就是说实例中用到的响应式理应都是在此时定义。而对于新添加的属性，实例没有办法感知数据变化。
+
+为此，Vue.js 定义了全局 API `Vue.set` 方法解决这个问题。
+
+```js title="src/core/observer/index.js"
+/**
+ * Set a property on an object. Adds the new property and
+ * triggers change notification if the property doesn't
+ * already exist.
+ */
+export function set(target: Array<any> | Object, key: any, val: any): any {
+  // ...
+  if (Array.isArray(target) && isValidArrayIndex(key)) {
+    target.length = Math.max(target.length, key);
+    target.splice(key, 1, val);
+    return val;
+  }
+  if (key in target && !(key in Object.prototype)) {
+    target[key] = val;
+    return val;
+  }
+  const ob = (target: any).__ob__;
+  // ...
+  if (!ob) {
+    target[key] = val;
+    return val;
+  }
+  // highlight-next-line
+  defineReactive(ob.value, key, val);
+  ob.dep.notify();
+  return val;
+}
+```
+
+`set` 方法的作用是给新添加的属性创建响应式。
+
+首先判断如果 `target` 是数组且 `key` 是一个合法的下标，则之前通过 `splice` 去添加进数组然后返回，这里的 `splice` 其实是已变异的数组方法。接着又判断 `key` 已经存在于 `target` 中，则直接赋值返回，因为这样的变化是可以观测到了。接着再判断如果 `target` 是一个响应式对象，则直接赋值并返回。最后通过 `defineReactive(ob.value, key, val)` 把新添加的属性变成响应式对象，然后再通过 `ob.dep.notify()` 手动的触发依赖通知，让添加新的属性到对象也可以检测到变化。
+
+### 数组类型
+
+Vue 也是不能检测到以下变动的数组：
+
+- 当你利用索引直接设置一个项时，例如：`vm.items[indexOfItem] = newValue`
+- 当你修改数组的长度时，例如：`vm.items.length = newLength`
+
+对于数组的响应式，实际上 Vue 是通过拦截数组原生方法，支持了数据响应能力。
+
+```js title="src/core/observer/index.js"
+export class Observer {
+  constructor(value: any) {
+    this.value = value;
+    this.dep = new Dep();
+    this.vmCount = 0;
+    def(value, '__ob__', this);
+    if (Array.isArray(value)) {
+      // highlight-start
+      const augment = hasProto ? protoAugment : copyAugment;
+      augment(value, arrayMethods, arrayKeys);
+      this.observeArray(value);
+      // highlight-end
+    } else {
+      // ...
+    }
+  }
+}
+```
+
+这里对数组类型的数据做了特殊处理，对于大部分现代浏览器都会走到 `protoAugment`，它实际上就把 `value` 的原型指向了 `arrayMethods`。
+
+```js title="src/core/observer/array.js"
+import { def } from '../util/index';
+
+// highlight-start
+const arrayProto = Array.prototype;
+export const arrayMethods = Object.create(arrayProto);
+// highlight-end
+
+// highlight-next-line
+const methodsToPatch = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'];
+
+/**
+ * Intercept mutating methods and emit events
+ */
+methodsToPatch.forEach(function (method) {
+  // cache original method
+  const original = arrayProto[method];
+  def(arrayMethods, method, function mutator(...args) {
+    const result = original.apply(this, args);
+    const ob = this.__ob__;
+    let inserted;
+    // highlight-start
+    switch (method) {
+      case 'push':
+      case 'unshift':
+        inserted = args;
+        break;
+      case 'splice':
+        inserted = args.slice(2);
+        break;
+    }
+    if (inserted) ob.observeArray(inserted);
+    // highlight-end
+    // notify change
+    ob.dep.notify();
+    return result;
+  });
+});
+```
+
+可以看到，`arrayMethods` 首先继承了 Array，然后对数组中所有能改变数组自身的方法进行重写。重写后的方法会先执行它们本身原有的逻辑，并对能增加数组长度的 3 个方法 `push`、`unshift`、`splice` 方法做了判断，获取到插入的值，然后把新添加的值变成一个响应式对象，并且再调用 `ob.dep.notify()` 手动触发依赖通知。
+
+这里定义了 7 个数组变异方法，分别是：`push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`，其中 3 个是可增加元素的方法，拦截其新增元素并定义响应式，最后手动通知视图更新。

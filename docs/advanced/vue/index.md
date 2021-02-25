@@ -4,7 +4,7 @@ title: 概览
 slug: /advanced/vue
 ---
 
-学习 Vue.js 源码笔记，内容包括：
+学习 Vue.js 源码笔记，建议阅读顺序：
 
 - 数据驱动
 - 组件化
@@ -12,6 +12,7 @@ slug: /advanced/vue
 - 响应式原理
   - nextTick
   - watcher vs. computed
+  - 组件更新
 - 编译
 
 笔记中带有部分个人的理解，并且重点的代码已高亮显示。
