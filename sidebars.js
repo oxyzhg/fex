@@ -50,6 +50,13 @@ module.exports = {
         'xss',
         'csrf',
       ].map(prefixed('advanced/security')),
+    },
+    {
+      type: 'category',
+      label: '计算机网络',
+      items: [
+        'http',
+      ].map(prefixed('advanced/network')),
     }
   ].map(prefixed('advanced')),
 
