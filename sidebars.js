@@ -135,6 +135,7 @@ module.exports = {
     'vue',
     'webpack',
     'performance',
+    'http',
     'others',
   ].map(prefixed('interview')),
 };
