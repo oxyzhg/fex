@@ -31,7 +31,7 @@ title: 跨域
 2. CORS
 3. postMessage
 4. WebSocket
-5. Nodejs 中间件代理
+5. Node 中间件代理
 6. Nginx 反向代理
 7. window.name+iframe
 8. location.hash+iframe
@@ -123,7 +123,50 @@ Access-Control-Allow-Credentials: true
 Access-Control-Max-Age: 1728000
 ```
 
-一旦服务器通过了预检请求，以后每次浏览器正常的 CORS 请求，就都跟简单请求一样，会有一个 `Origin` 头信息字段。服务器的回应，也都会有一个 `Access-Control-Allow-Origin` 头信息字段。
+一旦服务器通过了预检请求，以后每次浏览器正常的 CORS 请求，就都跟简单请求一样，会有一个 `Origin` 头信息字段。服务器的回应，也都会有一个 `Access-Control-Allow-Origin`
+
+### WebSocket
+
+WebSocket 是 HTML5 的一个持久化的协议，它实现了浏览器与服务器的全双工通信，同时也是跨域的一种解决方案。WebSocket 和 HTTP 都是应用层协议，都基于 TCP 协议。但是 WebSocket 是一种双向通信协议，在建立连接之后，WebSocket 的 server 与 client 都能主动向对方发送或接收数据。同时，WebSocket 在建立连接时需要借助 HTTP 协议，连接建立好了之后 client 与 server 之间的双向通信就与 HTTP 无关了。
+
+### postMessage
+
+postMessage 是 HTML5 XMLHttpRequest API，且是为数不多可以跨域操作的 window 属性之一，它可用于解决以下方面的问题：
+
+- 页面和其打开的新窗口的数据传递
+- 多窗口之间消息传递
+- 页面与嵌套的 iframe 消息传递
+- 上面三个场景的跨域数据传递
+
+postMessage 方法允许来自不同源的脚本采用异步方式进行有限的通信，可以实现跨文本档、多窗口、跨域消息传递。
+
+```js
+otherWindow.postMessage(message, targetOrigin, [transfer]);
+```
+
+### Node 中间件代理
+
+实现原理：同源策略是浏览器需要遵循的标准，而如果是服务器向服务器请求就无需遵循同源策略。代理服务器，需要做以下几个步骤：
+
+- 接受客户端请求
+- 将请求转发给服务器
+- 拿到服务器响应数据
+- 将响应转发给客户端
+
+### Nginx 反向代理
+
+实现原理类似于 Node 中间件代理，需要搭建一个中转 Nginx 服务器，用于转发请求。不同的是，Node 是正向代理，而 Ngixn 是反向代理。
+
+使用 Nginx 反向代理实现跨域，是最简单的跨域方式。只需要修改 Nginx 的配置即可解决跨域问题，支持所有浏览器，支持 session，不需要修改任何代码，并且不会影响服务器性能。
+
+实现思路：通过 Nginx 配置一个代理服务器（域名与 domain1 相同，端口不同）做跳板机，反向代理访问 domain2 接口，并且可以顺便修改 cookie 中 domain 信息，方便当前域 cookie 写入，实现跨域登录。
+
+## 总结
+
+- CORS 支持所有类型的 HTTP 请求，是跨域 HTTP 请求的根本解决方案
+- JSONP 只支持 GET 请求，JSONP 的优势在于支持老式浏览器，以及可以向不支持 CORS 的网站请求数据。
+- 不管是 Node 中间件代理还是 nginx 反向代理，主要是通过同源策略对服务器不加限制。
+- 日常工作中，用得比较多的跨域方案是 cors 和 nginx 反向代理
 
 ---
 
