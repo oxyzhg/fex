@@ -59,8 +59,6 @@ module.exports = {
               label: '数据结构与算法',
               to: 'docs/algorithms',
             },
-              to: 'docs/algorithms'
-            }
           ],
         },
         {
