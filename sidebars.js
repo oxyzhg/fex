@@ -12,16 +12,6 @@ module.exports = {
         'readme',
         'data-driven',
         'componentization',
-        // {
-        //   type: 'category',
-        //   label: '响应式数据',
-        //   items: [
-        //     'reactive',
-        //     'next-tick',
-        //     'computed-vs-watch',
-        //   ].map(prefixed('advanced/vue')),
-        //   collapsed: false,
-        // },
         'reactive',
         'compile',
         'lifecycle',
@@ -29,7 +19,7 @@ module.exports = {
         'computed-vs-watch',
         'component-update',
       ].map(prefixed('advanced/vue')),
-      collapsed: false,
+      // collapsed: false,
     },
     {
       type: 'category',
@@ -53,7 +43,7 @@ module.exports = {
     },
     {
       type: 'category',
-      label: '计算机网络',
+      label: '网络',
       items: [
         'http',
       ].map(prefixed('advanced/network')),
