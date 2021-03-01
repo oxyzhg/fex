@@ -10,7 +10,7 @@ module.exports = {
       label: 'JavaScript',
       items: [
         'inheritance',
-      ].map(prefixed('/advanced/javascript')),
+      ].map(prefixed('advanced/javascript')),
     },
     {
       type: 'category',
