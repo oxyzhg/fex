@@ -7,6 +7,13 @@ module.exports = {
     'readme',
     {
       type: 'category',
+      label: 'JavaScript',
+      items: [
+        'inheritance',
+      ].map(prefixed('/advanced/javascript')),
+    },
+    {
+      type: 'category',
       label: 'Vue.js',
       items: [
         'readme',
