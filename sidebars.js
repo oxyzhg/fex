@@ -53,6 +53,7 @@ module.exports = {
       label: '网络',
       items: [
         'http',
+        'websocket',
       ].map(prefixed('advanced/network')),
     }
   ].map(prefixed('advanced')),
