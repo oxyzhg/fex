@@ -73,6 +73,7 @@ module.exports = {
       collapsed: false,
     },
     'tree-shaking',
+    'rollup-usage',
   ].map(prefixed('engineering')),
 
   /* Performance */
