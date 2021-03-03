@@ -26,6 +26,7 @@ module.exports = {
         'computed-vs-watch',
         'component-update',
         'v-model',
+        'mvvm',
       ].map(prefixed('advanced/vue')),
       // collapsed: false,
     },
