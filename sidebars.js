@@ -25,6 +25,7 @@ module.exports = {
         'next-tick',
         'computed-vs-watch',
         'component-update',
+        'v-model',
       ].map(prefixed('advanced/vue')),
       // collapsed: false,
     },
