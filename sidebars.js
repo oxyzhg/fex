@@ -80,9 +80,13 @@ module.exports = {
 
   /* Performance */
   performance: [
-    'performance/readme',
-    'engineering/webpack/optimization-analysis',
-  ],
+    'readme',
+    {
+      type: 'doc',
+      id: 'engineering/webpack/optimization-analysis',
+    },
+    'vue',
+  ].map(prefixed('performance')),
 
   /* Data structures and Algorithms */
   algorithms: [
