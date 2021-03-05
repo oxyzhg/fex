@@ -10,6 +10,7 @@ module.exports = {
       label: 'JavaScript',
       items: [
         'inheritance',
+        'eventloop',
       ].map(prefixed('advanced/javascript')),
     },
     {
