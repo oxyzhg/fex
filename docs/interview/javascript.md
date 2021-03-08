@@ -126,6 +126,12 @@ Number(obj); // 998
 
 一般来说，隐式转换大多数最终都会转换为**数值型**进行比较。
 
+### Object.is() 与比较操作符 "==="、"==" 的区别？
+
+- 使用双等叛等，比较时先进行类型转换再比较。
+- 使用全等叛等，比较时不会进行类型转换。
+- Object.is 在全等的基础上处理了特殊情况，`±0` 不再相等、两个 `NaN` 相等。
+
 ### parseInt 和 Number 的返回结果都是数字，它们之间的区别是什么？
 
 使用 `parseInt()` 解析字符串，解析按从左到右的顺序，如果遇到非数字字符就停止。而使用 `Number()` 强制转换字符串，如果字符串含有非数字字符会失败并返回 `NaN`。
@@ -135,6 +141,10 @@ Number(obj); // 998
 - [详解 JS 中 Number()、parseInt() 和 parseFloat() 的区别](https://blog.csdn.net/m0_38099607/article/details/72638678)
 - [parseInt - JavaScript | MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt)
 - [parseFloat - JavaScript | MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseFloat)
+
+### 为什么 0.1 + 0.2 != 0.3？如何解决这个问题？
+
+JavaScript 中的小数默认遵循 [IEEE 754](https://baike.baidu.com/item/IEEE%20754) 标准，双精度浮点数使用 64 位固定长度来表示，符号位占 1 位，指数位占 11 位，小数位占 52 位。0.1 转换为二进制计算时精度丢失。
 
 ### + 操作符什么时候用于字符串的拼接？
 
@@ -259,3 +269,144 @@ xhr.send(null);
 AMD/CMD 的区别在于：AMD 推崇依赖前置、提前执行；CMD 推崇依赖就近、延迟执行。
 
 CommonJS/ESM 的区别在于：CommonJS 是运行时加载，导出的是值拷贝；ESM 是编译时加载，导出的是值引用。
+
+### DOM 操作——怎样添加、移除、移动、复制、创建和查找节点？
+
+```js
+// 创建新节点
+createDocumentFragment(node);
+createElement(node);
+createTextNode(text);
+// 添加、删除、替换、插入
+appendChild(node);
+removeChild(node);
+replaceChild(new,old);
+insertBefore(new,old);
+// 查找
+getElementById();
+getElementsByName();
+getElementsByTagName();
+getElementsByClassName();
+querySelector();
+querySelectorAll();
+// 属性操作
+getAttribute(key);
+setAttribute(key,value);
+hasAttribute(key);
+removeAttribute(key);
+```
+
+### JavaScript 类数组对象的定义？
+
+一个拥有 **length 属性**和若干**索引属性**的对象就可以被称为类数组对象，类数组对象和数组类似，但是不能调用数组的方法。常见的类数组对象有 arguments 和 DOM 方法的返回结果，还有一个函数也可以被看作是类数组对象，因为它含有 length 属性值，代表可接收的参数个数。
+
+### 如何理解作用域与变量声明提升？
+
+造成变量声明提升的本质原因是 js 引擎在代码执行前有一个解析的过程，创建了执行上下文，初始化了一些代码执行时需要用到的对象。当我们访问一个变量时，我们会到当前执行上下文中的作用域链中去查找，而作用域链的首端指向的是当前执行上下文的变量对象，这个变量对象是执行上下文的一个属性，它包含了函数的形参、所有的函数和变量声明，这个对象的是在代码解析的时候创建的。这就是会出现变量声明提升的根本原因。
+
+### 简单介绍一下 V8 引擎的垃圾回收机制
+
+v8 的垃圾回收机制基于分代回收机制，将内存分为新生代和老生代，分别由副垃圾回收器和主垃圾回收器进行标记清除。
+
+对于新生代对象，存储区域分为对象区域和空闲区域，数据一般存储在对象区域。当对象区域空间存满，执行 Scavenge 算法进行垃圾回收。首先，检查对象区域的存活对象，标记垃圾数据；然后，将存活对象有序复制到空闲区域，释放对象区域空间；最后，对调对象区域和空闲区域。
+
+对于老生代对象，采用了标记清除法进行垃圾清理。首先，标记内存中存活的对象；然后，清除掉垃圾数据；最后，进行内存整理，处理内存碎片。
+
+### 哪些操作会造成内存泄漏？
+
+- 意外的全局变量
+- 未清除的定时器或事件监听回调
+- 脱离 DOM 的引用
+- 闭包
+
+### JavaScript 的事件循环是什么？
+
+时间循环（EventLoop）是一个避免 JavaScript 单线程执行可能阻塞的机制。代码在执行过程中，通过创建不同的执行上下文，并压入执行栈中，保证代码的有序执行。执行如果遇到异步任务，线程不会等待异步任务返回结果，而是先将该事件挂起，继续执行其他任务。当异步事件有了返回结果，将其回调函数注册到相应的任务队列等待执行。
+
+任务队列通常分为宏任务队列和微任务队列，当执行栈空闲时，引擎会先检查微任务队列是否存在待执行任务，如果存在则依次执行微任务队列中所有任务，直到微任务队列被清空；如果微任务队列为空，则继续执行宏任务队列中的任务。每轮事件循环结束都会清空微任务队列，这样就保证了一些优先级较高的任务先执行。
+
+（列举常见的宏任务、微任务事件）
+
+### 模拟实现防抖与节流？
+
+```js
+function debounce(fn, delay) {
+  let timer = null;
+  return function (...args) {
+    if (timer) {
+      clearTimerout(timer);
+      timer = null;
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+}
+
+function throttle(fn, delay) {
+  let previous = 0;
+  return function (...args) {
+    let now = +new Date();
+    if (now - previous > delay) {
+      fn.apply(this, args);
+      previous = now;
+    }
+  };
+}
+```
+
+### 模拟实现深拷贝？
+
+```js
+function cloneDeep(obj, map = new Map()) {
+  if (obj === null || typeof obj !== 'obj') return obj;
+  if (map.has(obj)) return map.get(obj);
+  let cloneTarget = new obj.constructor();
+  map.set(obj, cloneTarget);
+  for (let key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      cloneTarget[key] = cloneDeep(obj[key], map);
+    }
+  }
+}
+```
+
+### 模拟实现 call/apply/bind？
+
+```js
+Function.prototype._call = function (context, ...params) {
+  if (typeof this !== 'function') {
+  }
+  context = context || window;
+  const fn = Symbol('fn');
+  context[fn] = this;
+  const result = context[fn](...params);
+  delete context[fn];
+  return result;
+};
+
+Function.prototype._apply = function (context, params) {
+  if (typeof this !== 'function') {
+  }
+  context = context || window;
+  const fn = Symbol('fn');
+  context[fn] = this;
+  const result = context[fn](...params);
+  delete context[fn];
+  return result;
+};
+
+Function.prototype._bind(context, ...params) {
+  if (typeof this !== 'function'){}
+  const self = this;
+  const fNOP = function() {}
+  const fBound = function(...bindArgs) {
+    return self.apply(this instanceof fNOP ? this : context, params.concat(bindArgs));
+  }
+  if (this.prototype) {
+    fNOP.prototype = Object.create(this.prototype);
+  }
+  fBound.prototype = new fNOP();
+  return fBound;
+}
+```
