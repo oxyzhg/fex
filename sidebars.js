@@ -72,11 +72,13 @@ module.exports = {
         'source-map',
         'hot-module-replacement',
         'optimization-analysis',
+        'module-federation',
       ].map(prefixed('engineering/webpack')),
       collapsed: false,
     },
     'tree-shaking',
     'rollup-usage',
+    'web-framework-design',
   ].map(prefixed('engineering')),
 
   /* Performance */
