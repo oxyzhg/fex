@@ -131,6 +131,7 @@ module.exports = {
         'promise',
         'localstorage',
         'array-flat',
+        'curry',
       ].map(prefixed('handwrittens')),
     },
   ],
