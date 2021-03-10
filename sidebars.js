@@ -111,7 +111,9 @@ module.exports = {
       label: '排序算法',
       items: [
         'readme',
-        'bubble-sort'
+        'bubble',
+        'selection',
+        'insertion',
       ].map(prefixed('sorts')),
     },
     {
