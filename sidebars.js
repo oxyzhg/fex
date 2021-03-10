@@ -10,6 +10,7 @@ module.exports = {
       label: 'JavaScript',
       items: [
         'inheritance',
+        'eventloop',
       ].map(prefixed('advanced/javascript')),
     },
     {
@@ -71,18 +72,24 @@ module.exports = {
         'source-map',
         'hot-module-replacement',
         'optimization-analysis',
+        'module-federation',
       ].map(prefixed('engineering/webpack')),
       collapsed: false,
     },
     'tree-shaking',
     'rollup-usage',
+    'web-framework-design',
   ].map(prefixed('engineering')),
 
   /* Performance */
   performance: [
-    'performance/readme',
-    'engineering/webpack/optimization-analysis',
-  ],
+    'readme',
+    {
+      type: 'doc',
+      id: 'engineering/webpack/optimization-analysis',
+    },
+    'vue',
+  ].map(prefixed('performance')),
 
   /* Data structures and Algorithms */
   algorithms: [
@@ -128,6 +135,7 @@ module.exports = {
         'promise',
         'localstorage',
         'array-flat',
+        'curry',
       ].map(prefixed('handwrittens')),
     },
   ],
