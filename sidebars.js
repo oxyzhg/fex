@@ -69,10 +69,10 @@ module.exports = {
       type: 'category',
       label: 'Webpack',
       items: [
+        'build-process',
+        'optimization-analysis',
         'source-map',
         'hot-module-replacement',
-        'optimization-analysis',
-        'module-federation',
       ].map(prefixed('engineering/webpack')),
       collapsed: false,
     },
