@@ -73,6 +73,7 @@ module.exports = {
         'optimization-analysis',
         'source-map',
         'hot-module-replacement',
+        'webpack5',
       ].map(prefixed('engineering/webpack')),
       collapsed: false,
     },
