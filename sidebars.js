@@ -80,6 +80,7 @@ module.exports = {
     'tree-shaking',
     'rollup-usage',
     'web-framework-design',
+    'typescript',
   ].map(prefixed('engineering')),
 
   /* Performance */
@@ -137,6 +138,8 @@ module.exports = {
         'localstorage',
         'array-flat',
         'curry',
+        'merge-promise',
+        'concurrent-poll',
       ].map(prefixed('handwrittens')),
     },
   ],
