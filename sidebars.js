@@ -33,6 +33,13 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'React.js',
+      items: [
+        'lifecycle',
+      ].map(prefixed('advanced/react')),
+    },
+    {
+      type: 'category',
       label: '浏览器',
       items: [
         'from-url-to-page-load',
