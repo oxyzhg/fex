@@ -130,6 +130,7 @@ module.exports = {
         'bubble',
         'selection',
         'insertion',
+        'merge',
       ].map(prefixed('sorts')),
     },
     {
