@@ -131,6 +131,7 @@ module.exports = {
         'selection',
         'insertion',
         'merge',
+        'quick',
       ].map(prefixed('sorts')),
     },
     {
