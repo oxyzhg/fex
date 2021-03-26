@@ -119,7 +119,8 @@ module.exports = {
       label: '算法',
       items: [
         'readme',
-        'leetcode'
+        'leetcode',
+        'template',
       ].map(prefixed('algorithms')),
     },
     {
