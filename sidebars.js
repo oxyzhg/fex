@@ -97,7 +97,7 @@ module.exports = {
       type: 'doc',
       id: 'engineering/webpack/optimization-analysis',
     },
-    'vue',
+    'project-practice',
   ].map(prefixed('performance')),
 
   /* Data structures and Algorithms */
