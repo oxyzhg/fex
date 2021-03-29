@@ -20,9 +20,9 @@
  */
 var reverseBetween = function(head, left, right) {
 
-  let start = head; // 开始的节点
+  let start = null; // 反转段起始元素
   let curr = head;
-  let i = 1;
+  let i  = 1;
 
   while (i < left) {
     start = curr;
@@ -30,9 +30,9 @@ var reverseBetween = function(head, left, right) {
     i++;
   }
 
-  let prev = null;
-  let tail = curr;
-
+  // 开始反转
+  let prev = null; // 新增链首值，是反转后的链尾
+  let tail = curr; // 记录反转后的末尾值
   while (i <= right) {
     let temp = curr.next;
     curr.next = prev;
@@ -41,10 +41,11 @@ var reverseBetween = function(head, left, right) {
     i++;
   }
 
+  // 反转后拼接链表
   start.next = prev;
   tail.next = curr;
 
-  return left === 1 ? prev : head;
+  return left === 1 ? prev: head;
 };
 // @lc code=end
 

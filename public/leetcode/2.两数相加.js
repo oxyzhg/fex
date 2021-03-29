@@ -20,30 +20,26 @@
 var addTwoNumbers = function (l1, l2) {
   let list = new ListNode(0);
   let head = list;
+  let sum = 0; // 进入下一轮的起始值
+  let carry = 0; // 控制进位
 
-  let cur1 = l1;
-  let cur2 = l2;
-
-  let sum;
-  let cover = 0;
-
-  while (cur1 || cur2 || cover) {
-    sum = cover;
-
-    if (cur1) {
-      sum += cur1.val;
-      cur1 = cur1.next;
+  while (l1 !== null || l2 !== null || sum > 0) {
+    if (l1 !== null) {
+      sum += l1.val;
+      l1 = l1.next;
     }
-
-    if (cur2) {
-      sum += cur2.val;
-      cur2 = cur2.next;
+    if (l2 !== null) {
+      sum += l2.val;
+      l2 = l2.next;
     }
-
-    cover = Number(sum > 9); // 更新进位
-
-    head.next = new ListNode(sum % 10);
+    if (sum >= 10) {
+      carry = 1;
+      sum = sum - 10;
+    }
+    head.next = new ListNode(sum);
     head = head.next;
+    sum = carry;
+    carry = 0;
   }
 
   return list.next;
