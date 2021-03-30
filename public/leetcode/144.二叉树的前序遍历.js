@@ -21,16 +21,26 @@ var preorderTraversal = function (root) {
   if (root === null) return [];
 
   const result = [];
-  const stack = [root];
+  const stack = [];
 
-  while (stack.length) {
-    const node = stack.pop();
-    result.push(node.val);
+  while (root !== null || stack.length) {
+    while (root !== null) {
+      result.push(root.val);
+      stack.push(root);
+      root = root.left;
+    }
 
-    if (node.right) stack.push(node.right);
-    if (node.left) stack.push(node.left);
+    root = stack.pop();
+    root = root.right;
   }
 
   return result;
 };
 // @lc code=end
+
+/**
+ * 迭代实现：利用栈后入先出的特点
+ * 1. 根节点入栈，进入迭代
+ * 2. 由于是前序遍历，因此直接取栈顶元素，即最后入栈的元素输出
+ * 3. 栈是后入先出，为保证先遍历左子树，因此先将右子树入栈
+ */
