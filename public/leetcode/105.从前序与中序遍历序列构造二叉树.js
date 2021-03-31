@@ -33,12 +33,19 @@ function build(preorder, preStart, preEnd, inorder, inStart, inEnd) {
       break;
     }
   }
-  const padStart = index - inStart;
-
+  const leftSize = index - inStart;
   const root = new TreeNode(rootVal);
-  root.left = build(preorder, preStart + 1, preStart + padStart, inorder, inStart, index - 1);
-  root.right = build(preorder, preStart + padStart + 1, preEnd, inorder, index + 1, inEnd);
+  // preorder: left [preStart+1, preStart+leftSize], right [preStart+leftSize+1, preEnd]
+  // inorder: left [inorder, index-1], right [index+1, inEnd]
 
+  root.left = build(
+    preorder, preStart + 1, preStart + leftSize,
+    inorder, inStart, index - 1
+  );
+  root.right = build(
+    preorder, preStart + leftSize + 1, preEnd,
+    inorder, index + 1, inEnd
+  );
   return root;
 }
 // @lc code=end

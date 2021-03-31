@@ -19,25 +19,27 @@
  * @return {number}
  */
 var kthSmallest = function (root, k) {
-  // 中序遍历对应二叉树排序
-  let res;
+  let result = null;
 
-  const helper = (node) => {
+  function traverse(node) {
     if (node === null) return;
 
-    // left
-    helper(node.left);
-    // current
-    if (--k === 0) {
-      res = node.val;
+    traverse(node.left);
+    k--;
+    if (k === 0) {
+      result = node.val;
       return;
     }
-    // right
-    helper(node.right);
-  };
+    traverse(node.right);
+  }
 
-  helper(root);
+  traverse(root);
 
-  return res;
+  return result;
 };
 // @lc code=end
+
+/**
+ * 思路：
+ * 1. 中序遍历的结果是有序的
+ */

@@ -23,7 +23,8 @@ var buildTree = function (inorder, postorder) {
 };
 
 function build(inorder, inStart, inEnd, postorder, postStart, postEnd) {
-  if (inStart > inEnd) return null;
+  if (postStart > postEnd) return null;
+
   const rootVal = postorder[postEnd];
   let index = 0;
   for (let i = inStart; i <= inEnd; i++) {
@@ -32,12 +33,18 @@ function build(inorder, inStart, inEnd, postorder, postStart, postEnd) {
       break;
     }
   }
-  const padStart = index - inStart;
-
+  const leftSize = index - inStart;
+  // postorder: left [preStart, postStart+leftSize-1], right [postStart+leftSize, postEnd-1]
+  // inorder: left [inStart, index-1], right [index+1, inEnd]
   const root = new TreeNode(rootVal);
-  root.left = build(inorder, inStart, index - 1, postorder, postStart, postStart + padStart - 1);
-  root.right = build(inorder, index + 1, inEnd, postorder, postStart + padStart, postEnd - 1);
-
+  root.left = build(
+    inorder, inStart, index - 1,
+    postorder, postStart, postStart + leftSize - 1
+  );
+  root.right = build(
+    inorder, index + 1, inEnd,
+    postorder, postStart + leftSize, postEnd - 1
+  );
   return root;
 }
 // @lc code=end
