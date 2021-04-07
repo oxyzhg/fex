@@ -1,6 +1,6 @@
 ---
-id: http
-title: HTTP 面试相关总结
+id: network
+title: 计算机网络相关题目总结
 ---
 
 import TOCInline from '@theme/TOCInline';

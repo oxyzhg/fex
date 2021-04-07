@@ -1,6 +1,6 @@
 ---
 id: vue
-title: Vue 面试相关总结
+title: Vue 相关题目总结
 ---
 
 import TOCInline from '@theme/TOCInline';

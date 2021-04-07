@@ -1,6 +1,6 @@
 ---
 id: javascript
-title: JavaScript 面试相关总结
+title: JavaScript 相关题目总结
 ---
 
 import TOCInline from '@theme/TOCInline';

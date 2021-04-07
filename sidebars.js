@@ -160,8 +160,9 @@ module.exports = {
     'css',
     'vue',
     'webpack',
+    'browser',
+    'network',
     'performance',
-    'http',
     'others',
   ].map(prefixed('interview')),
 };
