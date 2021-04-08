@@ -20,19 +20,26 @@
  * @return {TreeNode}
  */
 var lowestCommonAncestor = function (root, p, q) {
-  const max = Math.max(p.val, q.val);
   const min = Math.min(p.val, q.val);
+  const max = Math.max(p.val, q.val);
 
-  const find = (root) => {
-    if (root.val < min) {
-      return find(root.right);
-    } else if (root.val > max) {
-      return find(root.left);
+  const find = (node) => {
+    if (node.val < min) {
+      return find(node.right);
+    } else if (node.val > max) {
+      return find(node.left);
     } else {
-      return root;
+      return node;
     }
-  };
+  }
 
   return find(root);
 };
 // @lc code=end
+
+/**
+ * 思路：
+ * 同样是利用递归缩小查找范围
+ * 与二叉树不同的是，BST具有左小右大的性质
+ * 因此缩小范围更精确
+ */
