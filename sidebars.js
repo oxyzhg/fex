@@ -112,6 +112,7 @@ module.exports = {
         'linked-list',
         'doubly-linked-list',
         'binary-search-tree',
+        'binary-heap',
       ].map(prefixed('data-structures')),
     },
     {
