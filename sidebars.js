@@ -88,6 +88,7 @@ module.exports = {
     'rollup-usage',
     'web-framework-design',
     'typescript',
+    'microfrontend',
   ].map(prefixed('engineering')),
 
   /* Performance */
