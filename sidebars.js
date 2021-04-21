@@ -86,8 +86,8 @@ module.exports = {
     },
     'tree-shaking',
     'rollup-usage',
-    'web-framework-design',
     'typescript',
+    'web-framework-design',
     'microfrontend',
   ].map(prefixed('engineering')),
 
@@ -159,6 +159,7 @@ module.exports = {
   /* Front-end Interview */
   interview: [
     'javascript',
+    'html',
     'css',
     'vue',
     'webpack',

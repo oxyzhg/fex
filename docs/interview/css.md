@@ -395,3 +395,5 @@ BFC 特点：
   <div class="right">right</div>
 </div>
 ```
+
+### visibility 和 display 的差别（还有 opacity）
