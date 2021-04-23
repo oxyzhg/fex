@@ -19,23 +19,27 @@
 var levelOrder = function (root) {
   if (root === null) return [];
 
-  const result = [];
+  const ans = [];
   const queue = [root];
 
   while (queue.length) {
     const level = [];
-    const len = queue.length;
+    const length = queue.length; // 动态增加
 
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < length; i++) {
       const node = queue.shift();
       level.push(node.val);
       if (node.left) queue.push(node.left);
       if (node.right) queue.push(node.right);
     }
 
-    result.push(level);
+    ans.push(level);
   }
 
-  return result;
+  return ans;
 };
 // @lc code=end
+
+/**
+ * 思路：队列
+ */

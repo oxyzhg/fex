@@ -10,19 +10,31 @@
  * @return {number}
  */
 var lengthOfLongestSubstring = function (s) {
-  let map = {}; // hash cache
-  let left = 0; // left position
+  let map = {};
+  let ans = 0;
+  let left = 0;
 
-  return s.split('').reduce((max, v, i) => {
-    // 1. update left position 重复即更新
-    left = map[v] >= left ? map[v] + 1 : left;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charAt(i);
 
-    // 2. update latest position
-    map[v] = i;
+    if (map[c] >= left) {
+      left = map[c] + 1;
+    }
 
-    // 3. update the max value in each loop
-    return Math.max(max, i - left + 1);
-  }, 0);
+    map[c] = i;
+
+    ans = Math.max(ans, i - left + 1);
+  }
+
+  return ans;
 };
 
 // @lc code=end
+
+/**
+ * 思路：双指针，滑动窗口
+ * 1. 利用hash表缓存已经遍历的字符索引，并标记无重复字符的起点
+ * 2. 判重，如果再次遇到该值，且该值存储的索引大于等于左边界，则更新左边界至重复值索引后一位
+ * 3. 更新当前值对应索引，此时左边界到当前索引范围内不重复
+ * 4. 根据当前索引与左边界更新最大值
+ */
