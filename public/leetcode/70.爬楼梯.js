@@ -10,34 +10,36 @@
  * @return {number}
  */
 var climbStairs = function (n) {
-  // if (n <= 2) return n;
-  // let p = 1;
-  // let q = 1;
-  // let r;
-  // for (let i = 3; i < nums.length; i++) {
-  //   r = p + 1;
-  //   p = q;
-  //   q = r;
-  // }
-  // return q;
-
-  return help(n, new Map());
+  return helper(n, new Map());
 };
 
-const help = (n, map) => {
-  // 1. 递归终结条件：哈希表存即退出递归
-  // 2. 处理当前层：当前阶楼梯 f(n)=f(n-1)+f(n-2), 特殊地处理n<=2的情况
-  // 3. 下探到下一层：在处理当前层的时候，就包含下探操作
-  // 4. 清理状态：暂无
-
+function helper(n, map) {
   if (map.has(n)) return map.get(n);
 
   if (n <= 2) {
     map.set(n, n);
   } else {
-    map.set(n, help(n - 1, map) + help(n - 2, map));
+    map.set(n, helper(n - 1, map) + helper(n - 2, map));
   }
 
   return map.get(n);
-};
+}
 // @lc code=end
+
+/**
+ * 推导公式：f(n)=f(n-1)+f(n-2)
+ *
+ * 思路1：递归
+ * 1. 根据推导公式，我们可以发现这是一道DFS能解决的题目
+ * 2. 如果n<=2,那么设置特殊值即可，如果n>2,那么递归计算、
+ * 3. 特殊地，避免重复计算，增加一个hash缓存
+ *
+ * 思路2：动态规划
+ * 1. 建立数组存每一级的层数，特殊地 dp[1]=1, dp[2]=2
+ * 2. 从第三阶开始，遍历通过递推公式计算每阶的值
+ * 3. 最终返回 dp[n] 即可
+ *
+ * 思路3：遍历
+ * 1. 根据动态规划的思路，我们可以知道计算最后一次的值，只需要前两次的值即可，那么该方法就是动态规划的优化
+ * 2. 只需要两个变量保存倒1、倒2的值，其余的值不再保存
+ */

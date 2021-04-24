@@ -17,17 +17,18 @@
  * @return {TreeNode}
  */
 var invertTree = function (root) {
-  // terminator
   if (root === null) return null;
 
-  // drill down
   const left = invertTree(root.left);
   const right = invertTree(root.right);
 
-  // current
   root.left = right;
   root.right = left;
 
   return root;
 };
 // @lc code=end
+
+/**
+ * 思路：前序遍历、后序遍历都行
+ */

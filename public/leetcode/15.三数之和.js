@@ -10,35 +10,42 @@
  * @return {number[][]}
  */
 var threeSum = function (nums) {
-  let res = [];
-  let len = nums.length;
+  const result = [];
+  const length = nums.length;
   let p, q, sum;
 
-  nums.sort((a, b) => a - b)
+  nums = nums.sort((a, b) => a - b);
 
-  for (let i = 0; i < len; i++) {
-      if (nums[0] > 0) break;
-      if (i > 0 && nums[i] === nums[i - 1]) continue;
+  for (let i = 0; i < length; i++) {
+    if (nums[i] > 0) break;
+    if (i > 0 && nums[i] === nums[i - 1]) continue;
 
-      p = i + 1;
-      q = len - 1;
+    p = i + 1;
+    q = length - 1;
 
-      while (p < q) {
-          sum = nums[i] + nums[p] + nums[q];
+    while (p < q) {
+      sum = nums[i] + nums[p] + nums[q];
 
-          if (sum === 0) {
-              res.push([nums[i], nums[p], nums[q]]);
+      if (sum === 0) {
+        result.push([nums[i], nums[p], nums[q]]);
 
-              while (p < q && nums[p] === nums[p + 1]) p++;
-              while (p < q && nums[q] === nums[q - 1]) q--;
-              p++;
-              q--;
-          }
-          else if (sum < 0) p++;
-          else if (sum > 0) q--;
+        while (p < q && nums[p] === nums[p + 1]) p++;
+        while (p < q && nums[q] === nums[q - 1]) q--;
+        p++;
+        q--;
+      } else if (sum < 0) {
+        p++;
+      } else {
+        q--;
       }
+    }
   }
 
-  return res;
+  return result;
 };
 // @lc code=end
+
+/**
+ * 思路：双指针，夹逼
+ * 1. 排序，让数组成为有序数组，方便后续剪枝和夹逼
+ */

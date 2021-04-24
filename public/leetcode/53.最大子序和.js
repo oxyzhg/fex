@@ -10,16 +10,32 @@
  * @return {number}
  */
 var maxSubArray = function (nums) {
-  // DP方程: max_sum=max(f(n), max_sum())
+  // let ans = -Number.MAX_SAFE_INTEGER;
+  // let prev = 0;
 
-  let max = -Number.MAX_SAFE_INTEGER;
-  let prev = 0;
+  // for (let curr of nums) {
+  //   prev = Math.max(prev + curr, curr);
+  //   ans = Math.max(ans, prev);
+  // }
 
-  for (let i = 0; i < nums.length; i++) {
-    prev = Math.max(prev + nums[i], nums[i]);
-    max = Math.max(prev, max);
+  // return ans;
+
+  // let prev = nums[0];
+
+  for (let i = 1; i < nums.length; i++) {
+    if (nums[i - 1] > 0) {
+      nums[i] = nums[i] + nums[i - 1];
+    }
   }
 
-  return max;
+  return Math.max(...nums);
 };
 // @lc code=end
+
+/**
+ * 思路1：动态规划
+ * 1. 若前一个元素大于0，则将其加到当前元素上
+ *
+ * 思路2：贪心算法
+ * 1. 若当前指针所指元素之前的和小于0，则丢弃当前元素之前的数列
+ */

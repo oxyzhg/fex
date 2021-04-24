@@ -25,6 +25,7 @@ var kthSmallest = function (root, k) {
     if (node === null) return;
 
     traverse(node.left);
+    // current
     k--;
     if (k === 0) {
       result = node.val;
