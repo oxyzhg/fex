@@ -11,41 +11,25 @@
  * @return {number}
  */
 var coinChange = function (coins, amount) {
-  // 1. greedy
-  // coins.sort((a, b) => b - a);
-
-  // let res = Infinity;
-
-  // const find = (k, amount, count) => {
-  //   const coin = coins[k];
-
-  //   if (k === coins.length - 1) {
-  //     if (amount % coin === 0) {
-  //       res = Math.min(res, count + ~~(amount / coin));
-  //     }
-  //   } else {
-  //     for (let i = ~~(amount / coin); i >= 0 && count + i < res; i--) {
-  //       find(k + 1, amount - coin * i, count + 1);
-  //     }
-  //   }
-  // };
-
-  // find(0, amount, 0);
-
-  // return res === Infinity ? -1 : res;
-
-  // 2. dp
   const dp = Array(amount + 1).fill(Infinity);
   dp[0] = 0;
 
   for (let i = 0; i <= amount; i++) {
     for (let coin of coins) {
-      if (i - coin >= 0) {
-        dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-      }
+      if (i - coin < 0) continue;
+      dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
     }
   }
 
   return dp[amount] === Infinity ? -1 : dp[amount];
 };
 // @lc code=end
+
+/**
+ * 思路1：动态规划
+ * 1. dp[i] 代表找零i元，需要最小硬币数
+ * 2. base case 是 dp[0]=0, 即找零0元不需要硬币数
+ * 3. 状态转移方程 dp[i]=min(dp[i], 1+dp[i-coin])
+ *
+ * 思路2：贪心算法
+ */
