@@ -150,6 +150,7 @@ module.exports = {
         'localstorage',
         'array-flat',
         'curry',
+        'jsonp',
         'merge-promise',
         'concurrent-poll',
       ].map(prefixed('handwrittens')),
