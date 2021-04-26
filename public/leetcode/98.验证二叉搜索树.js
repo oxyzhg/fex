@@ -25,7 +25,7 @@ function isValid(node, min, max) {
 
   if (min && node.val <= min.val) return false;
   if (max && node.val >= max.val) return false;
-  
+
   return isValid(node.left, min, node) && isValid(node.right, node, max);
 }
 

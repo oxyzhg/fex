@@ -11,23 +11,20 @@
  */
 var permute = function (nums) {
   const result = [];
-  const len = nums.length;
 
-  const helper = (curr) => {
-    // terminator
-    if (curr.length === len) {
-      result.push(curr);
+  const traverse = (current) => {
+    if (current.length === nums.length) {
+      result.push(current);
       return;
     }
 
-    // current
     for (let num of nums) {
-      if (curr.includes(num)) continue;
-      helper([...curr, num]);
+      if (current.includes(num)) continue;
+      traverse([...current, num]);
     }
-  };
+  }
 
-  helper([]);
+  traverse([]);
 
   return result;
 };
