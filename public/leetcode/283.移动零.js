@@ -10,12 +10,24 @@
  * @return {void} Do not return anything, modify nums in-place instead.
  */
 var moveZeroes = function (nums) {
-  let j = 0;
+  let slow = 0;
+  let fast = 0;
 
-  for (let i = 0; i < nums.length; i++) {
-    if (nums[i] !== 0) [nums[j++], nums[i]] = [nums[i], nums[j]];
+  while (fast < nums.length) {
+    if (nums[fast] !== 0) {
+      nums[slow] = nums[fast];
+      slow++;
+    }
+    fast++;
   }
-
-  return nums;
+  for (let i = slow; i < nums.length; i++) {
+    nums[i] = 0;
+  }
 };
 // @lc code=end
+
+/**
+ * 思路：双指针
+ * 1. 快指针扫描到非零值，放到慢指针位置
+ * 2. 快指针从0开始扫描，慢指针从零开始作为待填充位
+ */
