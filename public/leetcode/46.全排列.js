@@ -12,19 +12,18 @@
 var permute = function (nums) {
   const result = [];
 
-  const traverse = (current) => {
-    if (current.length === nums.length) {
-      result.push(current);
+  const backtrack = (selected, options) => {
+    if (selected.length === nums.length) {
+      result.push(selected);
       return;
     }
-
-    for (let num of nums) {
-      if (current.includes(num)) continue;
-      traverse([...current, num]);
+    for (let num of options) {
+      if (selected.includes(num)) continue;
+      backtrack([...selected, num], options);
     }
-  }
+  };
 
-  traverse([]);
+  backtrack([], nums);
 
   return result;
 };

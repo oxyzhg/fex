@@ -21,11 +21,9 @@
 var hasPathSum = function (root, targetSum) {
   if (root === null) return false;
 
-  if (!root.left && !root.right) {
-    return root.val === targetSum;
-  } else {
-    return hasPathSum(root.left, targetSum - root.val) || hasPathSum(root.right, targetSum - root.val);
-  }
+  if (!root.left && !root.right) return root.val === targetSum;
+
+  return hasPathSum(root.left, targetSum - root.val) || hasPathSum(root.right, targetSum - root.val);
 };
 // @lc code=end
 

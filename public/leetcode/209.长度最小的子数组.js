@@ -11,20 +11,20 @@
  * @return {number}
  */
 var minSubArrayLen = function (target, nums) {
-  let distance = Number.MAX_SAFE_INTEGER;
+  let ans = Number.MAX_SAFE_INTEGER;
   let start = 0;
   let sum = 0;
 
-  for (let end = 0; end < nums.length; end++) {
-    sum += nums[end];
+  for (let i = 0; i < nums.length; i++) {
+    sum += nums[i];
 
     while (sum >= target) {
-      distance = Math.min(distance, end - start + 1);
+      ans = Math.min(ans, i - start + 1);
       sum -= nums[start++];
     }
   }
 
-  return distance === Number.MAX_SAFE_INTEGER ? 0 : distance;
+  return ans === Number.MAX_SAFE_INTEGER ? 0 : ans;
 };
 // @lc code=end
 

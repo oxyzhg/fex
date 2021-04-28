@@ -21,11 +21,14 @@ var sumNumbers = function (root) {
   return traverse(root, 0);
 };
 
-function traverse(root, sum) {
-  if (!root) return 0;
-  sum = sum * 10 + root.val;
-  if (!root.left && !root.right) return sum;
-  return traverse(root.left, sum) + traverse(root.right, sum);
+function traverse(node, sum) {
+  if (node === null) return 0;
+
+  sum = sum * 10 + node.val;
+
+  if (!node.left && !node.right) return sum;
+
+  return traverse(node.left, sum) + traverse(node.right, sum);
 }
 // @lc code=end
 

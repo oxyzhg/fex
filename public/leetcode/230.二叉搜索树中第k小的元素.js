@@ -21,18 +21,17 @@
 var kthSmallest = function (root, k) {
   let result = null;
 
-  function traverse(node) {
+  const traverse = (node) => {
     if (node === null) return;
 
-    traverse(node.left);
-    // current
+    if (node.left) traverse(node.left);
     k--;
     if (k === 0) {
       result = node.val;
       return;
     }
-    traverse(node.right);
-  }
+    if (node.right) traverse(node.right);
+  };
 
   traverse(root);
 

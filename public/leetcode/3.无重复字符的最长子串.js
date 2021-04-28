@@ -10,19 +10,17 @@
  * @return {number}
  */
 var lengthOfLongestSubstring = function (s) {
-  let map = {};
   let ans = 0;
+  let map = {};
   let left = 0;
 
+  // 双指针范围 [left,i]
   for (let i = 0; i < s.length; i++) {
     const c = s.charAt(i);
-
     if (map[c] >= left) {
       left = map[c] + 1;
     }
-
     map[c] = i;
-
     ans = Math.max(ans, i - left + 1);
   }
 

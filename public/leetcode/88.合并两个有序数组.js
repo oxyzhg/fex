@@ -13,7 +13,7 @@
  * @return {void} Do not return anything, modify nums1 in-place instead.
  */
 var merge = function (nums1, m, nums2, n) {
-  let index = m + n - 1;
+  let index = m + n - 1; // 从尾部插入
 
   while (index >= 0) {
     if (m > 0 && n > 0) {

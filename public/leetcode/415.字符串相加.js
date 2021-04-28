@@ -11,24 +11,22 @@
  * @return {string}
  */
 var addStrings = function (num1, num2) {
-  let i = num1.length - 1;
-  let j = num2.length - 1;
-
+  let ans = '';
+  let m = num1.length - 1;
+  let n = num2.length - 1;
   let carry = 0;
-  let sum = '';
 
-  while (i >= 0 || j >= 0 || carry > 0) {
-    if (i >= 0) {
-      carry += +num1[i--];
+  while (m >= 0 || n >= 0 || carry > 0) {
+    if (m >= 0) {
+      carry += +num1[m--];
     }
-    if (j >= 0) {
-      carry += +num2[j--];
+    if (n >= 0) {
+      carry += +num2[n--];
     }
-
-    sum = (carry % 10) + sum;
+    ans = (carry % 10) + ans;
     carry = Math.floor(carry / 10);
   }
 
-  return sum;
+  return ans;
 };
 // @lc code=end

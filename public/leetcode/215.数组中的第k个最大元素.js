@@ -11,8 +11,10 @@
  * @return {number}
  */
 var findKthLargest = function (nums, k) {
-  let heap = nums.slice(0, k);
-  buildHeap(heap, k);
+  const heap = nums.slice(0, k);
+  for (let i = Math.floor((k - 1) / 2); i >= 0; i--) {
+    heapify(heap, i, k);
+  }
 
   for (let i = k; i < nums.length; i++) {
     if (nums[i] > heap[0]) {
@@ -24,24 +26,20 @@ var findKthLargest = function (nums, k) {
   return heap[0];
 };
 
-function buildHeap(items, size) {
-  for (let i = Math.floor((size - 1) / 2); i >= 0; i--) {
-    heapify(items, i, size);
-  }
-}
-function heapify(items, index, size) {
+function heapify(heap, index, heapSize) {
   let element = index;
   const left = index * 2 + 1;
   const right = index * 2 + 2;
-  if (left < size && items[left] < items[element]) {
+
+  if (left < heapSize && heap[left] < heap[element]) {
     element = left;
   }
-  if (right < size && items[right] < items[element]) {
+  if (right < heapSize && heap[right] < heap[element]) {
     element = right;
   }
   if (element !== index) {
-    [items[element], items[index]] = [items[index], items[element]];
-    heapify(items, element, size);
+    [heap[element], heap[index]] = [heap[index], heap[element]];
+    heapify(heap, element, heapSize);
   }
 }
 // @lc code=end
