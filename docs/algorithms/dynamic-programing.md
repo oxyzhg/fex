@@ -9,7 +9,7 @@ title: 动态规划专题
 
 1. **重叠子问题**：动态规划的穷举有点特别，因为这类问题存在重叠子问题，如果暴力穷举的话效率会极其低下，所以需要备忘录或者 DP table 来优化穷举过程，避免不必要的计算。
 2. **最优子结构**：动态规划问题一定会具备最优子结构，才能通过子问题的最值得到原问题的最值。
-3. **状态转译方程**：虽然动态规划的核心思想是穷举求最值，但问题往往千变万化，穷举并不容易，只有列出正确的状态转移方程才能正确地穷举。这也是解决动态规划问题最难的一步。
+3. **状态转移方程**：虽然动态规划的核心思想是穷举求最值，但问题往往千变万化，穷举并不容易，只有列出正确的状态转移方程才能正确地穷举。这也是解决动态规划问题最难的一步。
 
 列状态转移方程的思路：
 
@@ -36,7 +36,7 @@ function fib(N) {
 ```js
 function fib(N) {
   const memo = new Map();
-  return traverse(n, memo);
+  return traverse(N, memo);
 }
 function traverse(n, memo) {
   // base case
@@ -86,9 +86,12 @@ function fib(N) {
 
 ## 力扣常见题目
 
-- [509. 斐波那契数](https://leetcode-cn.com/problems/fibonacci-number/)
-- [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
-- [53. 最大子序和](https://leetcode-cn.com/problems/maximum-subarray/)
+- [509.斐波那契数](https://leetcode-cn.com/problems/fibonacci-number/)
+- [322.零钱兑换](https://leetcode-cn.com/problems/coin-change/)
+- [53.最大子序和](https://leetcode-cn.com/problems/maximum-subarray/)
+- [718.最长重复子数组](https://leetcode-cn.com/problems/maximum-length-of-repeated-subarray/)
+- [1143.最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/description/)
+- [5.最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/description/)
 
 ## 常见问题解题思路
 
@@ -96,13 +99,17 @@ function fib(N) {
 
 ```js title="322.零钱兑换"
 var coinChange = function (coins, amount) {
-  const dp = Array(amount + 1).fill(Infinity); // dp[i] 代表兑换i零钱所需最少硬币数
-  dp[0] = 0; // base case
+  // dp[i] 表示兑换i零钱所需最少硬币数
+  const dp = Array(amount + 1).fill(Infinity);
+  // base case
+  dp[0] = 0;
 
   for (let i = 0; i <= amount; i++) {
     for (let coin of coins) {
       if (i - coin < 0) continue; // 跳过无效子问题
-      dp[i] = Math.min(dp[i], 1 + dp[i - coin]); // 状态转移方程
+      // 状态转移方程
+      // highlight-next-line
+      dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
     }
   }
 
@@ -115,14 +122,159 @@ var coinChange = function (coins, amount) {
 ```js title="53.最大子序和"
 var maxSubArray = function (nums) {
   if (nums.length === 0) return 0;
-  const dp = []; // dp[i] 代表第i位的最大子序
-  dp[0] = nums[0]; // base case
+  // dp[i] 表示第i位的最大子序
+  const dp = [];
+  // base case
+  dp[0] = nums[0];
 
   for (let i = 1; i < nums.length; i++) {
-    dp[i] = Math.max(nums[i], dp[i - 1] + nums[i]); // 转态转移方程，前面的和如果是负数，就取当前值从新计算
+    // 转态转移方程，前面的和如果是负数，就取当前值从新计算
+    // highlight-next-line
+    dp[i] = Math.max(nums[i], dp[i - 1] + nums[i]);
   }
   return Math.max(...dp);
 };
 ```
 
 ### 最长公共子序列
+
+```js title="718.最长重复子数组"
+var findLength = function (nums1, nums2) {
+  const m = nums1.length;
+  const n = nums2.length;
+  // dp[i][j] 表示从i到j之间最长公共子序
+  const dp = Array.from(Array(m + 1), () => Array(n + 1).fill(0));
+  // base case: dp[i][0]=dp[0][j]=0
+  let ans = 0;
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (nums1[i - 1] === nums2[j - 1]) {
+        // 状态转移方程，前一对重复的基础上才能加一
+        // highlight-next-line
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+        ans = Math.max(ans, dp[i][j]);
+      }
+    }
+  }
+
+  return ans;
+};
+```
+
+```js title="1143.最长公共子序列"
+var longestCommonSubsequence = function (text1, text2) {
+  const m = text1.length;
+  const n = text2.length;
+  // dp[i][j] 表示从i到j之间最长公共子序
+  const dp = Array.from(Array(m + 1), () => Array(n + 1).fill(0));
+  // base case: dp[0][j]=dp[i][0]=0
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (text1.charAt(i - 1) === text2.charAt(j - 1)) {
+        // highlight-next-line
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+      } else {
+        // highlight-next-line
+        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+  }
+
+  return dp[m][n];
+};
+```
+
+### 最长回文子序
+
+```js title="5.最长回文子串"
+// 待补充动态规划写法
+```
+
+### 股票买卖系列问题
+
+股票买卖相关题目动态规划解题思路：
+
+- `dp[i][k][s]` 代表第 i 天第 k 次交易买入或卖出的最大收益
+- base case:
+  - `dp[-1][k][0] = dp[i][0][0] = 0`
+  - `dp[-1][k][1] = dp[i][0][1] = -Infinity` 不存在的场景
+- 状态转移方程：取决于是否维持前一天的状态
+  - `dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k][0] + prices[i])`
+  - `dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i])`
+
+以上思路对于不同的股票买卖题目，其 k 值或许不同，具体场景再分析。
+
+```js title="121.买卖股票的最佳时机"
+var maxProfit = function (prices) {
+  const n = prices.length;
+  // dp[i][s] 表示第i天的最大收益
+  const dp = Array.from(Array(n), () => Array(2));
+
+  for (let i = 0; i < n; i++) {
+    if (i === 0) {
+      // base case
+      dp[i][0] = 0;
+      dp[i][1] = -prices[i];
+      continue;
+    }
+    // 状态转移方程
+    // highlight-start
+    dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i]);
+    dp[i][1] = Math.max(dp[i - 1][1], -prices[i]);
+    // highlight-end
+  }
+
+  return dp[n - 1][0];
+};
+```
+
+```js title="122.买卖股票的最佳时机II"
+var maxProfit = function (prices) {
+  const n = prices.length;
+  // dp[i][s] 表示第i天的最大收益
+  const dp = Array.from(Array(n), () => Array(2));
+
+  for (let i = 0; i < n; i++) {
+    if (i === 0) {
+      // base case
+      dp[i][0] = 0;
+      dp[i][1] = -prices[i];
+      continue;
+    }
+    // 状态转移方程
+    // highlight-start
+    dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i]);
+    dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
+    // highlight-end
+  }
+
+  return dp[n - 1][0];
+};
+```
+
+### 打家劫舍系列问题
+
+```js title="198.打家劫舍"
+var rob = function (nums) {
+  const n = nums.length;
+  if (n === 0) return 0;
+  // dp[i] 表示从第i家开始抢，能够抢到最多的钱
+  const dp = Array(n + 1).fill();
+  // base case
+  dp[n] = 0;
+
+  for (let i = n - 1; i >= 0; i--) {
+    if (i === n - 1) {
+      dp[i] = nums[i];
+      continue;
+    }
+    // 状态转移方程：取决于前一天是否抢
+    // highlight-next-line
+    dp[i] = Math.max(dp[i + 1], nums[i] + dp[i + 2]);
+  }
+
+  return dp[0];
+};
+```

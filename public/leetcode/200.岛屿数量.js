@@ -10,33 +10,42 @@
  * @return {number}
  */
 var numIslands = function (grid) {
-  let count = 0;
+  let ans = 0;
 
-  const dfsMark = (x, y) => {
+  const rows = grid.length;
+  const cols = grid[0].length;
+
+  const traverse = (x, y) => {
+
     if (grid[x][y] === '1') {
-      grid[x][y] = '0';
+      grid[x][y] = '0'; // 夷为平地，标记为已访问
     } else {
       return;
     }
 
-    // 这里做边界拦截，递归剪枝操作，防止爆栈
-    if (x < grid.length - 1) dfsMark(x + 1, y);
-    if (x > 0 && x < grid.length) dfsMark(x - 1, y);
-    if (y < grid[x].length - 1) dfsMark(x, y + 1);
-    if (y > 0 && y < grid[x].length) dfsMark(x, y - 1);
+    if (x + 1 < rows) traverse(x + 1, y);
+    if (x - 1 >= 0) traverse(x - 1, y);
+    if (y + 1 < cols) traverse(x, y + 1);
+    if (y - 1 >= 0) traverse(x, y - 1);
   };
 
-  // 遍历网格
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      // 如果是岛屿，把岛屿周边都夷为平地
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j< cols; j++) {
       if (grid[i][j] === '1') {
-        count++;
-        dfsMark(i, j);
+        ans++;
+        traverse(i, j);
       }
     }
   }
 
-  return count;
+  return ans;
 };
 // @lc code=end
+
+/**
+ * 思路：DFS
+ * 1. 深度优先遍历，如果当前是1表示陆地，则计数加一
+ * 2. 然后将该陆地周边相连的陆地都夷为平地，防止后续重复标记
+ * 3. 深度优先遍历的过程中，要判断判断的边界，并选择合适的退出条件
+ * 4. 明确我们深度优先遍历的过程的将陆地关联的周边岛屿都夷为平地的过程，本身不涉及其他操作
+ */

@@ -51,11 +51,7 @@ var uniquePaths = function (m, n) {
   // return helper(1, 1, memo);
 
   // 解法3: 动态规划（自底向上）
-  const dp = new Array(m + 1);
-  for (let i = 0; i < dp.length; i++) {
-    dp[i] = new Array(n + 1).fill(1);
-  }
-
+  const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(1));
   dp[m][n] = 1;
 
   for (let i = m - 1; i > 0; i--) {
@@ -67,3 +63,10 @@ var uniquePaths = function (m, n) {
   return dp[1][1];
 };
 // @lc code=end
+
+/**
+ * 思路：动态规划
+ * 1. dp[i][j] 表示从位置[i,j]移动到位置[m,n]所需路径数
+ * 2. base case dp[m][n]=1 本题需要自顶向下遍历  实际上dp[m][j]=dp[i][n]=1 因为只能单向走 另一方面也能反映出距离终点越近可选的路越少
+ * 3. 状态转移方程 dp[i][j]=dp[i+1][j]+dp[i][j+1]
+ */
