@@ -1,5 +1,5 @@
 ---
-id: browser-cache
+id: cache
 title: 浏览器缓存
 ---
 

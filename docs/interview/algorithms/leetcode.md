@@ -3,7 +3,7 @@ id: leetcode
 title: 力扣高频算法题
 ---
 
-import LeetCodeType from '../../src/components/LeetCodeType';
+import LeetCodeType from '../../../src/components/LeetCodeType';
 
 在一些大厂的前端面试中，会被问到一些 LeetCode 算法题。本篇旨在汇总常见的题目，从而帮助前端面试者快速学习、熟悉题目应对面试。算法题按数据结构可分为：字符串系列、数组系列、链表系列、二叉树系列、栈、队列、哈希表等；按解题技巧可分为：动态规划、回溯、DFS、BFS、滑动窗口、双指针等。面试中会问到的题目不限于此，题目会不定期更新。
 

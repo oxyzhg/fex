@@ -1,5 +1,5 @@
 ---
-id: browser-storage
+id: storage
 title: 浏览器存储
 ---
 

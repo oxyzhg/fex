@@ -1,5 +1,5 @@
 ---
-id: browser-gc
+id: gc
 title: 垃圾回收
 ---
 

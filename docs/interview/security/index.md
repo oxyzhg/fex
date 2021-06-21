@@ -1,7 +1,7 @@
 ---
 id: readme
 title: 概览
-slug: /advanced/security
+slug: /forward/security
 ---
 
 常见的 Web 安全攻击包括但不限于：XSS 攻击、CSRF 攻击、SQL 注入、DDoS 攻击、流量劫持等。

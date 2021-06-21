@@ -2,8 +2,8 @@
 const prefixed = (prefix) => (item) => (typeof item === 'string' ? `${prefix}/${item}` : item);
 
 module.exports = {
-  /* Front-end Advanced */
-  advanced: [
+  /** Forward */
+  forward: [
     'readme',
     {
       type: 'category',
@@ -11,7 +11,14 @@ module.exports = {
       items: [
         'inheritance',
         'eventloop',
-      ].map(prefixed('advanced/javascript')),
+      ].map(prefixed('forward/javascript')),
+    },
+    {
+      type: 'category',
+      label: 'React',
+      items: [
+        'lifecycle',
+      ].map(prefixed('forward/react')),
     },
     {
       type: 'category',
@@ -28,53 +35,43 @@ module.exports = {
         'component-update',
         'v-model',
         'mvvm',
-      ].map(prefixed('advanced/vue')),
-      // collapsed: false,
+      ].map(prefixed('forward/vue')),
     },
     {
       type: 'category',
-      label: 'React.js',
+      label: 'Node.js',
       items: [
-        'lifecycle',
-      ].map(prefixed('advanced/react')),
+        'readme',
+      ].map(prefixed('forward/nodejs')),
     },
     {
       type: 'category',
       label: '浏览器',
       items: [
         'from-url-to-page-load',
-        'browser-storage',
-        'browser-cache',
-        'browser-gc',
+        'storage',
+        'cache',
+        'gc',
         'cross-origin',
-      ].map(prefixed('advanced/browser')),
+      ].map(prefixed('forward/browser')),
     },
     {
       type: 'category',
-      label: '安全',
+      label: '设计模式',
       items: [
         'readme',
-        'xss',
-        'csrf',
-      ].map(prefixed('advanced/security')),
+      ].map(prefixed('forward/design-pattern')),
     },
-    {
-      type: 'category',
-      label: '网络',
-      items: [
-        'http',
-        'websocket',
-      ].map(prefixed('advanced/network')),
-    }
-  ].map(prefixed('advanced')),
+  ].map(prefixed('forward')),
 
-  /* Front-end Engineering */
+  /** Engineering */
   engineering: [
     'readme',
     'module',
     {
       type: 'category',
       label: 'Webpack',
+      collapsed: false,
       items: [
         'build-process',
         'optimization-analysis',
@@ -82,7 +79,6 @@ module.exports = {
         'hot-module-replacement',
         'webpack5',
       ].map(prefixed('engineering/webpack')),
-      collapsed: false,
     },
     'tree-shaking',
     'rollup-usage',
@@ -91,7 +87,7 @@ module.exports = {
     'microfrontend',
   ].map(prefixed('engineering')),
 
-  /* Performance */
+  /** Performance */
   performance: [
     'readme',
     {
@@ -101,8 +97,14 @@ module.exports = {
     'project-practice',
   ].map(prefixed('performance')),
 
-  /* Data structures and Algorithms */
-  algorithms: [
+  /** Practice */
+  practice: [
+    'readme',
+  ].map(prefixed('practice')),
+
+  /** Interview */
+  interview: [
+    'readme',
     {
       type: 'category',
       label: '数据结构',
@@ -114,7 +116,7 @@ module.exports = {
         'doubly-linked-list',
         'binary-search-tree',
         'binary-heap',
-      ].map(prefixed('data-structures')),
+      ].map(prefixed('interview/data-structures')),
     },
     {
       type: 'category',
@@ -125,7 +127,7 @@ module.exports = {
         'dynamic-programing',
         'backtrack',
         'leetcode',
-      ].map(prefixed('algorithms')),
+      ].map(prefixed('interview/algorithms')),
     },
     {
       type: 'category',
@@ -137,7 +139,7 @@ module.exports = {
         'insertion',
         'merge',
         'quick',
-      ].map(prefixed('sorts')),
+      ].map(prefixed('interview/sorts')),
     },
     {
       type: 'category',
@@ -155,20 +157,22 @@ module.exports = {
         'jsonp',
         'merge-promise',
         'concurrent-poll',
-      ].map(prefixed('handwrittens')),
+      ].map(prefixed('interview/handwrittens')),
     },
-  ],
-
-  /* Front-end Interview */
-  interview: [
-    'javascript',
-    'html',
-    'css',
-    'vue',
-    'webpack',
-    'browser',
-    'network',
-    'performance',
-    'others',
+    {
+      type: 'category',
+      label: '面试题目合辑',
+      items: [
+        'html',
+        'css',
+        'javascript',
+        'vue',
+        'webpack',
+        'browser',
+        'network',
+        'performance',
+        'others',
+      ].map(prefixed('interview/questions')),
+    },
   ].map(prefixed('interview')),
 };

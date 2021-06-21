@@ -12,13 +12,13 @@ module.exports = {
     navbar: {
       title: 'FEX',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Logo',
         src: 'img/logo.svg',
       },
       items: [
         {
-          to: 'docs/advanced',
-          activeBasePath: 'docs/advanced',
+          to: 'docs/forward',
+          activeBasePath: 'docs/forward',
           label: '前端进阶',
           position: 'right',
         },
@@ -32,6 +32,12 @@ module.exports = {
           to: 'docs/performance',
           activeBasePath: 'docs/performance',
           label: '性能优化',
+          position: 'right',
+        },
+        {
+          to: '/docs/practice',
+          activeBasePath: 'docs/practice',
+          label: '开发实践',
           position: 'right',
         },
         {
@@ -49,15 +55,11 @@ module.exports = {
           items: [
             {
               label: '前端进阶',
-              to: 'docs/advanced',
+              to: 'docs/forward',
             },
             {
-              label: '前端工程化',
-              to: 'docs/engineering',
-            },
-            {
-              label: '数据结构与算法',
-              to: 'docs/algorithms',
+              label: '前端面试',
+              to: 'docs/interview',
             },
           ],
         },
@@ -65,12 +67,12 @@ module.exports = {
           title: 'Community',
           items: [
             {
-              label: '掘金',
-              href: 'https://juejin.cn/user/571401775099528',
-            },
-            {
               label: '语雀',
               href: 'https://www.yuque.com/oxyzhg',
+            },
+            {
+              label: '掘金',
+              href: 'https://juejin.cn/user/571401775099528',
             },
           ],
         },
