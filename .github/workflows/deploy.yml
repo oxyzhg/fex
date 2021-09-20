@@ -23,10 +23,10 @@ jobs:
           npm run build
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: build
-          REPOSITORY_NAME: oxyzhg/oxyzhg.github.io
-          TARGET_FOLDER: fex
+          branch: gh-pages
+          folder: build
+          token: ${{ secrets.DEPLOY_TOKEN }}
+          repository-name: oxyzhg/oxyzhg.github.io
+          target-folder: fex
