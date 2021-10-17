@@ -22,7 +22,7 @@ title: 从输入URL到页面加载过程
 
 DNS 解析是一个迭代查询+递归查询的过程，具体步骤如下图：
 
-![DNS](../../assets/dns-resolve.jpg)
+![DNS](/img/posts/dns-resolve.jpg)
 
 上述图片是查找 www.kaola.com 的 IP 地址过程。首先在本地域名服务器中查询 IP 地址，如果没有找到的情况下，本地域名服务器会向根域名服务器发送一个请求，如果根域名服务器也不存在该域名时，本地域名会向 com 顶级域名服务器发送一个请求，依次类推下去。直到最后本地域名服务器得到 google 的 IP 地址并把它缓存到本地，供下次查询使用。
 
@@ -63,7 +63,7 @@ TCP（Transmission Control Protocol，传输控制协议）是一种面向连接
 
 请求报文是由 4 部分组成：**请求行**、**请求报头**、**空行**、**请求包体**。
 
-![HTTP Request](../../assets/http-request.png)
+![HTTP Request](/img/posts/http-request.png)
 
 ### 请求行
 
@@ -103,7 +103,7 @@ GET /users HTTP/1.1
 
 HTTP 响应报文也是由三部分组成：**响应行**、**响应报头**和**响应报文**。
 
-![HTTP Response](../../assets/http-response.png)
+![HTTP Response](/img/posts/http-response.png)
 
 ### 响应行
 
@@ -125,7 +125,7 @@ HTTP 响应报文也是由三部分组成：**响应行**、**响应报头**和*
 
 客户端拿到服务端返回的响应报文，进行数据解析并渲染页面。
 
-![Page Rander](../../assets/page-rander.png)
+![Page Rander](/img/posts/page-rander.png)
 
 浏览器解析渲染页面分为以下几个步骤：
 

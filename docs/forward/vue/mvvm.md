@@ -9,7 +9,7 @@ GUI(图形用户界面)的设计结构一搬包括**视图**(View)、**模型**(
 
 MVC（Model-View-Controller）把 GUI 分成 View、Model、Controller 三个模块。
 
-![MVC](../../assets/mvc.png)
+![MVC](/img/posts/mvc.png)
 
 - **View**：检测用户的键盘、鼠标等行为，传递调用 Controller 执行应用逻辑。View 更新需要从 Model 重新获取数据。
 - **Controller**：处理 View 和 Model 之间协作的应用逻辑或业务逻辑。
@@ -28,7 +28,7 @@ MVC（Model-View-Controller）把 GUI 分成 View、Model、Controller 三个模
 
 MVP（Model-View-Presenter）是 MVC 模式的一种改良，打破了 View 对于 Model 的依赖，其余的依赖关系保持不变。
 
-![MVP](../../assets/mvp.png)
+![MVP](/img/posts/mvp.png)
 
 - **View**：View 不再处理同步逻辑，对 Presenter 提供接口调用。由于不再依赖 Model，可以让 View 从特定的业务场景中抽离，从而做到组件化。
 - **Presenter**：与经典 Controller 相比，任务更加繁重，不仅要处理应用业务逻辑，还要处理同步逻辑（高层次复杂的 UI 操作）。
@@ -43,7 +43,7 @@ MVP（Model-View-Presenter）是 MVC 模式的一种改良，打破了 View 对�
 
 MVVM（Model-View-ViewModel）模式是在 MVP 模式的基础上进行了改良，将 Presenter 改良成 ViewModel（抽象视图）。
 
-![MVVM](../../assets/mvvm.png)
+![MVVM](/img/posts/mvvm.png)
 
 - **ViewModel**：与 Presenter 相比，内部集成了 Binder(Data-binding Engine，数据绑定引擎)，实现 View 和 Model 的双向绑定，一方发生变化另一方可自动更新。
 - **View**：可组件化，例如目前各种流行的 UI 组件框架，View 的变化会通过 Binder 自动更新相应的 Model。

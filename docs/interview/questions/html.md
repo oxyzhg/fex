@@ -21,7 +21,7 @@ import TOCInline from '@theme/TOCInline';
 
 由于 script 代码的加载和执行会阻塞 html 的渲染，我们常通过 `<script>` 标签提供的 **async** 和 **defer** 属性指定异步加载资源，它们用来说明 script 脚本应该如何执行。在没有 src 属性的情况下，async 和 defer 属性可以不指定值。
 
-![async and defer](../../assets/async-and-defer.jpg)
+![async and defer](/img/posts/async-and-defer.jpg)
 
 更多资料可以参考：[async vs defer attributes](https://www.growingwiththeweb.com/2014/02/async-vs-defer-attributes.html)
 

@@ -5,7 +5,7 @@ title: HTTP
 
 ## OSI 七层模型
 
-![OSI](../../assets/osi-model.png)
+![OSI](/img/posts/osi-model.png)
 
 从上到下分别是：
 
@@ -35,7 +35,7 @@ HTTP 报文有两种，一种是请求报文，一种是响应报文。
 
 HTTP 请求报文的格式如下：
 
-![HTTP Request](../../assets/http-request.png)
+![HTTP Request](/img/posts/http-request.png)
 
 HTTP 请求报文的第一行叫做请求行，后面的行叫做请求头部，请求头部后还可以跟一个请求实体。请求头部之后有一个空行，这个空行不能省略，它用来划分首部与实体。
 
@@ -61,7 +61,7 @@ HTTP 请求报文的第一行叫做请求行，后面的行叫做请求头部，
 
 HTTP 响应报文的格式如下：
 
-![HTTP Response](../../assets/http-response.png)
+![HTTP Response](/img/posts/http-response.png)
 
 HTTP 响应报文的第一行叫做状态行，后面的行是首部行，最后是实体主体。
 

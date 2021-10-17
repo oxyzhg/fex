@@ -791,7 +791,7 @@ function createChildren(vnode, children, insertedVnodeQueue) {
 
 上面我们梳理了把模板和数据渲染成最终的 DOM 的过程。其实理解到 `mountComponent` 方法实例了一个渲染 Watcher，把更新视图的逻辑注册到回调里即可，其他的内容再深入就设计到编译过程了。
 
-![new vue](../../assets/new-vue.png)
+![new vue](/img/posts/new-vue.png)
 
 整个过程看起来十分复杂，因为分支逻辑太多，且很难理清。实际上，这是动态给构造函数装配属性方法，然后执行方法的过程。从主线上来看，这个过程完成了以下几件事：
 

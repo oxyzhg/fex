@@ -55,7 +55,7 @@ Push Cache（推送缓存）是 HTTP/2 中的内容，当以上三种缓存都�
 
 浏览器与服务器通信的方式为应答模式，即：浏览器发起 HTTP 请求 – 服务器响应该请求。浏览器第一次向服务器发起该请求后拿到请求结果后，将请求结果和缓存标识存入浏览器缓存，浏览器对于缓存的处理是根据第一次请求资源时返回的响应头来确定。
 
-![Browser Cache](../../assets/browser-cache-process.png)
+![Browser Cache](/img/posts/browser-cache-process.png)
 
 由上图我们可以确定两点：
 
@@ -74,7 +74,7 @@ Push Cache（推送缓存）是 HTTP/2 中的内容，当以上三种缓存都�
 2. 没有命中强缓存规则，浏览器会发送请求，根据请求头的 `Last-Modified` 和 `Etag` 判断是否命中协商缓存，如果命中，直接从缓存获取资源。如果没有命中，则进入下一步。
 3. 如果前两步都没有命中，则直接从服务端获取资源。
 
-![Browser Cache](../../assets/browser-cache-theoty.png)
+![Browser Cache](/img/posts/browser-cache-theoty.png)
 
 ### 强缓存
 

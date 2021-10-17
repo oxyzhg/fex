@@ -274,27 +274,27 @@ function updateChildren(parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly)
 
 第一步：
 
-![Vue diff update children](../../assets/vue-diff-update-children-1.jpg)
+![Vue diff update children](/img/posts/vue-diff-update-children-1.jpg)
 
 第二步：
 
-![Vue diff update children](../../assets/vue-diff-update-children-2.jpg)
+![Vue diff update children](/img/posts/vue-diff-update-children-2.jpg)
 
 第三步：
 
-![Vue diff update children](../../assets/vue-diff-update-children-3.jpg)
+![Vue diff update children](/img/posts/vue-diff-update-children-3.jpg)
 
 第四步：
 
-![Vue diff update children](../../assets/vue-diff-update-children-4.jpg)
+![Vue diff update children](/img/posts/vue-diff-update-children-4.jpg)
 
 第五步：
 
-![Vue diff update children](../../assets/vue-diff-update-children-5.jpg)
+![Vue diff update children](/img/posts/vue-diff-update-children-5.jpg)
 
 第六步：
 
-![Vue diff update children](../../assets/vue-diff-update-children-6.jpg)
+![Vue diff update children](/img/posts/vue-diff-update-children-6.jpg)
 
 ## 总结
 
