@@ -5,8 +5,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 (module.exports = {
   title: 'FEX',
-  tagline: 'Reading makes a full man, conference a ready man, and writing an exact man.',
-  url: 'https://your-docusaurus-test-site.com',
+  tagline: 'Help every front-end developer grow valuable.',
+  url: 'https://oxyzhg.cn',
   baseUrl: '/fex/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -24,7 +24,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
           routeBasePath: 'docs',
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/',
+          editUrl: 'https://github.com/oxyzhg/fex/edit/main/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
