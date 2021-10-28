@@ -20,8 +20,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          path: 'docs',
-          routeBasePath: 'docs',
+          path: 'series',
+          routeBasePath: 'series',
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl: 'https://github.com/oxyzhg/fex/edit/main/',
@@ -44,26 +44,26 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
         },
         items: [
           {
-            to: 'docs/forward',
-            activeBasePath: 'docs/forward',
+            to: 'series/forward',
+            activeBasePath: 'series/forward',
             label: '前端进阶',
             position: 'right',
           },
           {
-            to: 'docs/engineering',
-            activeBasePath: 'docs/engineering',
+            to: 'series/engineering',
+            activeBasePath: 'series/engineering',
             label: '工程化',
             position: 'right',
           },
           {
-            to: 'docs/performance',
-            activeBasePath: 'docs/performance',
+            to: 'series/performance',
+            activeBasePath: 'series/performance',
             label: '性能优化',
             position: 'right',
           },
           {
-            to: '/docs/practice',
-            activeBasePath: 'docs/practice',
+            to: '/series/practice',
+            activeBasePath: 'series/practice',
             label: '开发实践',
             position: 'right',
           },
@@ -82,11 +82,11 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             items: [
               {
                 label: '前端进阶',
-                to: 'docs/forward',
+                to: 'series/forward',
               },
               {
                 label: '前端面试',
-                to: 'docs/interview',
+                to: 'series/interview',
               },
             ],
           },
