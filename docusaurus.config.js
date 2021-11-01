@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 (module.exports = {
   title: 'FEX',
   tagline: 'Help every front-end developer grow valuable.',
-  url: 'https://oxyzhg.cn',
-  baseUrl: '/fex/',
+  url: 'https://fex.oxyzhg.cn',
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
