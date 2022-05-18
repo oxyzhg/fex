@@ -186,4 +186,80 @@ module.exports = {
       ].map(prefixed('interview/questions')),
     },
   ].map(prefixed('interview')),
+
+  browser: [
+    'readme',
+    {
+      type: 'category',
+      label: '宏观视角上的浏览器',
+      items: [
+        'lesson01',
+        'lesson02',
+        'lesson03',
+        'lesson04',
+        'lesson05',
+        'lesson06',
+      ].map(prefixed('browser-working-principle/part1')),
+    },
+    {
+      type: 'category',
+      label: '浏览器中的JavaScript执行机制',
+      items: [
+        'lesson07',
+        'lesson08',
+        'lesson09',
+        'lesson10',
+        'lesson11',
+      ].map(prefixed('browser-working-principle/part2')),
+    },
+    {
+      type: 'category',
+      label: 'V8工作原理',
+      items: [
+        'lesson12',
+        'lesson13',
+        'lesson14',
+      ].map(prefixed('browser-working-principle/part3')),
+    },
+    {
+      type: 'category',
+      label: '浏览器中的页面循环系统',
+      items: [
+        'lesson15',
+        'lesson16',
+        'lesson17',
+        'lesson18',
+        'lesson19',
+        'lesson20',
+      ].map(prefixed('browser-working-principle/part4')),
+    },
+    {
+      type: 'category',
+      label: '浏览器中的页面',
+      items: [
+        'lesson21',
+        'lesson22',
+        'lesson23',
+        'lesson24',
+        'lesson25',
+        'lesson26',
+        'lesson27',
+        'lesson28',
+      ].map(prefixed('browser-working-principle/part5')),
+    },
+    {
+      type: 'category',
+      label: '浏览器中的网络',
+      items: [
+        'lesson29',
+        'lesson30',
+        'lesson31',
+        'lesson32',
+        'lesson33',
+        'lesson34',
+        'lesson35',
+        'lesson36',
+      ].map(prefixed('browser-working-principle/part6')),
+    },
+  ].map(prefixed('browser-working-principle')),
 };

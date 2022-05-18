@@ -68,6 +68,12 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             position: 'right',
           },
           {
+            to: '/series/browser-working-principle',
+            activeBasePath: '/series/browser-working-principle',
+            label: '浏览器工作原理与实践',
+            position: 'right',
+          },
+          {
             href: 'https://github.com/oxyzhg/fex',
             label: 'GitHub',
             position: 'right',
