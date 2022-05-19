@@ -1,9 +1,12 @@
+// @ts-check
+// Note: type annotations allow type checking and IDEs autocompletion
+
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 // With JSDoc @type annotations, IDEs can provide config autocompletion
-/** @type {import('@docusaurus/types').DocusaurusConfig} */
-(module.exports = {
+/** @type {import('@docusaurus/types').Config} */
+const config = {
   title: 'FEX',
   tagline: 'Help every front-end developer grow valuable.',
   url: 'https://fex.oxyzhg.cn',
@@ -11,16 +14,19 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
+
+  // GitHub pages deployment config.
+  // If you aren't using GitHub pages, you don't need these.
   organizationName: 'oxyzhg',
   projectName: 'oxyzhg.github.io',
 
   presets: [
     [
-      '@docusaurus/preset-classic',
+      'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          path: 'series',
+          path: 'docs',
           routeBasePath: 'series',
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
@@ -62,15 +68,9 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             position: 'right',
           },
           {
-            to: '/series/practice',
+            to: 'series/practice',
             activeBasePath: 'series/practice',
             label: '开发实践',
-            position: 'right',
-          },
-          {
-            to: '/series/browser-working-principle',
-            activeBasePath: '/series/browser-working-principle',
-            label: '浏览器工作原理与实践',
             position: 'right',
           },
           {
@@ -87,8 +87,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             title: 'Docs',
             items: [
               {
-                label: '前端进阶',
-                to: 'series/forward',
+                label: '浏览器工作原理与实践',
+                to: 'series/browser-working-principle',
               },
               {
                 label: '前端面试',
@@ -126,5 +126,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
+      metadata: [{name: 'keywords', content: 'cooking, blog'}],
     }),
-});
+};
+
+module.exports = config;
