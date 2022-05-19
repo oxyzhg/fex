@@ -2,7 +2,10 @@
 id: readme
 title: 概览
 slug: /browser-working-principle
+sidebar_position: 0
 ---
+
+> Referer: https://blog.poetries.top/browser-working-principle/
 
 ## CONTENT
 
